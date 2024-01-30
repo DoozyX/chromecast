@@ -115,7 +115,7 @@ CastPlayer.prototype.initializeCastPlayer = function () {
     options.androidReceiverCompatible = false;
     // options.androidReceiverCompatible = true;
 
-    cast.framework.CastContext.getInstance().setOptions({ receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID });
+    cast.framework.CastContext.getInstance().setOptions(options);
 
     let credentialsData = new chrome.cast.CredentialsData("{\"userId\": \"abc\"}");
     cast.framework.CastContext.getInstance().setLaunchCredentialsData(credentialsData);
