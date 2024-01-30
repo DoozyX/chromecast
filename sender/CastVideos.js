@@ -112,7 +112,7 @@ CastPlayer.prototype.initializeCastPlayer = function () {
     // TAB_AND_ORIGIN_SCOPED - Auto connect from same appId, page origin, and tab
     // PAGE_SCOPED - No auto connect
     options.autoJoinPolicy = chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED;
-    options.androidReceiverCompatible = false;
+    // options.androidReceiverCompatible = false;
     // options.androidReceiverCompatible = true;
 
     cast.framework.CastContext.getInstance().setOptions(options);
