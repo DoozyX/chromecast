@@ -86,9 +86,7 @@
     window['__onGCastApiAvailable'] = function (isAvailable) {
       console.log('cast is available', isAvailable)
       if (isAvailable) {
-        setTimeout(() => {
-          castPlayer.initializeCastPlayer();
-        }, 1000)
+        castPlayer.initializeCastPlayer();
       }
     };
   </script>
