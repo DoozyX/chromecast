@@ -98,22 +98,22 @@ var CastPlayer = function () {
 };
 
 CastPlayer.prototype.initializeCastPlayer = function () {
-
+    console.log('initializeCastPlayer');
     var options = {};
 
     // Set the receiver application ID to your own (created in the
     // Google Cast Developer Console), or optionally
     // use the chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID
-    // options.receiverApplicationId = 'C0868879';
-    options.receiverApplicationId = 'chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID';
+    options.receiverApplicationId = '72A0DA66';
+    // options.receiverApplicationId = 'chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID';
 
     // Auto join policy can be one of the following three:
     // ORIGIN_SCOPED - Auto connect from same appId and page origin
     // TAB_AND_ORIGIN_SCOPED - Auto connect from same appId, page origin, and tab
     // PAGE_SCOPED - No auto connect
     options.autoJoinPolicy = chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED;
-    // options.androidReceiverCompatible = false;
-    options.androidReceiverCompatible = true;
+    options.androidReceiverCompatible = false;
+    // options.androidReceiverCompatible = true;
 
     cast.framework.CastContext.getInstance().setOptions(options);
 
@@ -133,6 +133,7 @@ CastPlayer.prototype.initializeCastPlayer = function () {
  */
 
 CastPlayer.prototype.switchPlayer = function () {
+    console.log('switchPlayer: ' + this.remotePlayer.isConnected);
     this.stopProgressTimer();
     this.resetVolumeSlider();
     this.playerHandler.stop();
