@@ -16,16 +16,16 @@ setTimeout(() => {
     setTimeout(() => {
       playerLogger.debug("set src");
       const url =
-        "https://edge1.salomtv.uz:11610/auth-streaming/3,1e40dbf0de37cb046fb5eb566a4728b8ddd1902c,1706805078,nauman,0-A4654-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,2.51.51.90/hls/vod/0-A4654-hls-UNIQCAST/playlist.m3u8";
-      const licence =
-        "https://edge1.salomtv.uz:11610/drmproxy/wv/license?lat=n2wSNPubbFa3KJEJKdI2QuqEKSBe8h8AXiLPm%2B%2BhEGoPTVnF9GmIN%2FZAUDONkJ3nmVFRb8YEWtV92N4qrxaaQD%2FIwuCFWPGb2IYzXaAOQNmXgjL9d%2BHNq0eT6BuFssXlMerxOJQqJGIa6FLNAKvYP4oFgk2NUluEdKWbc%2Flmh7cTitGBzpCENjqCbW2Y1R6WbFXpw%2Bmfydxydz%2F9oygrQT03q50K3QcYVrITQULRJfyT9C9f%2F3eEi5%2BYBFCv72vy";
+        "https://edge1.salomtv.uz:11610/auth-streaming/3,125141f2cea7377d4b7e0a35f6c5faeeeb7d2b2b,1706862317,nauman,0-A4674-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,2.51.51.90/hls/vod/0-A4674-hls-UNIQCAST/playlist.m3u8";
+      const license =
+        "https://edge1.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkO5NLygYpPGYNH%2FHik%2FMDakObuEApWxbOjRM13HTpYtZHiC4Kp%2FScVH0Md%2FVbd4cbqW2imywRqD4RSOCIOq4TRY4ZIzM0Aiejq6LH%2BrEsDbE80PpfVfx1iAlQPlPfW86egBKDFHORaS773NaTzV8Et7xP8VmEzm8oLYIsljV5KFOe5bRaN9L7KrinvUYEO3kXGrT9q3VfhAYhFjqx0oIvGv9UTk7BHgeX3Th6F7htPe4";
       const jwt =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY3MjA1MDYsImlhdCI6MTcwNjcxODcwNiwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.lR2xLytB9CxOGPRh2YuEx6YCx15sxHOWQuxSJTrHeAM";
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY3Nzc2ODYsImlhdCI6MTcwNjc3NTg4NiwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.QYVUoz11GKk0lCmi60dhTQzRz1_SDoQvKaSAl1ratsE";
       player
         .setSrc(url, {
           type: "widevine",
           data: {
-            licenseUrl: licence,
+            licenseUrl: license,
           },
           headers: {
             Authorization: jwt,
