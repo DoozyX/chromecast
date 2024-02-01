@@ -16,11 +16,11 @@ setTimeout(() => {
     setTimeout(() => {
       playerLogger.debug("set src");
       const url =
-        "https://edge2.salomtv.uz:11610/auth-streaming/3,1682b6c258dc5ff0b0309c90f857c3a44a86f5cb,1706866124,nauman,0-A4684-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,2.51.51.90/hls/vod/0-A4684-hls-UNIQCAST/playlist.m3u8";
+        "https://edge1.salomtv.uz:11610/auth-streaming/3,bec848bf4af483a5eec664bba31f17ab34a38636,1706869137,nauman,0-A4674-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,2.51.51.90/hls/vod/0-A4674-hls-UNIQCAST/playlist.m3u8";
       const license =
-        "https://edge2.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkIDxWY6zX0id6Clbv20%2BCm8WoGUNdR9jhdUXYBJjZG0udKDceFXUVRB3WUtICkJPHMJZWggBptDLRYki%2BqBSgox82Sbq7LuQ8UaS91EmuKwGn%2FWz0WzDD6QpXqP%2Bfq5Rx4K6c1BxvUUgLT4YyfkKXwTFWpMQAgTvj4XJ2zaxOPhWkdSZFQ5ZS2PP%2BNAFTy2wc7G%2FsdKeJB0%2FRlPce6eIC%2Frr%2F4ihvg0oc7Z66t%2Fd66Pb";
+        "https://edge1.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkO5NLygYpPGYNH%2FHik%2FMDakObuEApWxbOjRM13HTpYtZHiC4Kp%2FScVH0Md%2FVbd4cbqW2imywRqD4RSOCIOq4TRY4ZIzM0Aiejq6LH%2BrEsDbEaIjlk2t4M3zu77jwuxT99B6Ug%2FQaJgB1c%2FY%2FyP7z%2FgU060z7qjveuwjSf8%2FzSSQdML5k9BbGT%2FdTtI4OePJIXZCfJjVU2BUMM7dgwxlXIhU%3D";
       const jwt =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY3ODEzODEsImlhdCI6MTcwNjc3OTU4MSwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.uiFp0epW5_ssY3_khtbxm89Yl6Oo1uHkQH-QYWrmino";
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY3ODMxODAsImlhdCI6MTcwNjc4MTM4MCwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.t_lAwy-nvDvWspBUv2RCoEkaMENa7MjIS4DdvcOdXGQ";
       player
         .setSrc(url, {
           type: "widevine",
