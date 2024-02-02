@@ -56,4 +56,7 @@ playerManager.addEventListener(cast.framework.events.EventType.ERROR, (event) =>
   }
 });
 
-context.start();
+let castReceiverOptions = new cast.framework.CastReceiverOptions();
+castReceiverOptions.skipPlayersLoad = true;
+
+context.start(castReceiverOptions);
