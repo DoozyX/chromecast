@@ -20,7 +20,7 @@ setTimeout(() => {
       const license =
         "https://edge1.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkO5NLygYpPGYNH%2FHik%2FMDakObuEApWxbOjRM13HTpYtZHiC4Kp%2FScVH0Md%2FVbd4cbqW2imywRqD4RSOCIOq4TRY4ZIzM0Aiejq6LH%2BrEsDbESa4QtvzLtEH%2Bz5AAFmQGPtQTpY2ePugl5rb0z5Eno3JrchfN%2BdXMHeEwJ2rm1Naej3nLb8biV2U2HHEFS0V9lZA%2BOwxp1jZYX1ySaHUio6%2Fg8ILFG3wUh3Kma219Fjpk";
       const jwt =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY4ODE2MTksImlhdCI6MTcwNjg3OTgxOSwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.BRd9yz7ODH7MPYA5FeffF3eB6cEDr9894Xsg-YBxXGc";
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY4ODIyNjksImlhdCI6MTcwNjg4MDQ2OSwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.VY8y4z-Hh4YhBktIKmba4D5jaARlzk4mpOoTxlGzEKM";
       player
         .setSrc(url, {
           type: "widevine",
