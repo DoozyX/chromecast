@@ -16,11 +16,11 @@ setTimeout(() => {
     setTimeout(() => {
       playerLogger.debug("set src");
       const url =
-        "https://edge2.salomtv.uz:11610/auth-streaming/3,1caf8af248219cda3f68c84c7cc22d4c06088861,1706944190,nauman,0-A4662-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,87.201.183.110/hls/vod/0-A4662-hls-UNIQCAST/playlist.m3u8";
+        "https://edge2.salomtv.uz:11610/auth-streaming/3,58852a4e6483381f023bcd77d87a02ea3c0f754c,1706963290,nauman,0-A4654-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,87.201.183.110/hls/vod/0-A4654-hls-UNIQCAST/playlist.m3u8";
       const license =
-        "https://edge2.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkFGBuC3oGgdwEKfdUCywMdg2ls1PK%2B%2FhEN%2FflG6sl64p8uOf5eOexzJAuZoQl1a3LYzOUc4yxSRS0GI4P5cOcnzlx4BSSNeH4%2BINun2VLzuR9MuS1UyhTGlx3XX1Dc0et7Vj89V5RFpD4wPX5DOzWv9unoAdHm811EwVVG0HvyZZpile0zOdXbkkoU0nSd4H32TgmA7Z%2FGXV8QS5PFQgedI%3D";
+        "https://edge2.salomtv.uz:11610/drmproxy/wv/license?lat=n2wSNPubbFa3KJEJKdI2QuqEKSBe8h8AXiLPm%2B%2BhEGoPTVnF9GmIN%2FZAUDONkJ3nmVFRb8YEWtV92N4qrxaaQD%2FIwuCFWPGb2IYzXaAOQNmXgjL9d%2BHNq0eT6BuFssXlE5af2CR0emte%2B6mKZ%2FWovHLm65hxdwP01miqL4eyg0k8G11L13%2B%2BEkwYE1Hoxpla91A4gYg6eNSU5pikhzCXKJqQmkvWQ%2BXI6Hq%2Bh%2B9R%2FUdpIcgLXmJwhDZpUiZNQnpt";
       const jwt =
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY4NTk1NjcsImlhdCI6MTcwNjg1Nzc2NywiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.8dLhHFuzV5uraHfNbEU3Z5KY4kbjQ-0404PJkps_9T4";
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY4Nzg2NTksImlhdCI6MTcwNjg3Njg1OSwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.jP-26rM5MMA24TIeC91XvktQC69S86DyifdMVBHNC54";
       player
         .setSrc(url, {
           type: "widevine",
