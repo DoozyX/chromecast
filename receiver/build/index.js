@@ -9,9 +9,9 @@ setTimeout(function () {
         playerLogger.debug("player initialized");
         setTimeout(function () {
             playerLogger.debug("set src");
-            var url = "https://edge1.salomtv.uz:11610/auth-streaming/3,bec848bf4af483a5eec664bba31f17ab34a38636,1706869137,nauman,0-A4674-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,2.51.51.90/hls/vod/0-A4674-hls-UNIQCAST/playlist.m3u8";
-            var license = "https://edge1.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkO5NLygYpPGYNH%2FHik%2FMDakObuEApWxbOjRM13HTpYtZHiC4Kp%2FScVH0Md%2FVbd4cbqW2imywRqD4RSOCIOq4TRY4ZIzM0Aiejq6LH%2BrEsDbEaIjlk2t4M3zu77jwuxT99B6Ug%2FQaJgB1c%2FY%2FyP7z%2FgU060z7qjveuwjSf8%2FzSSQdML5k9BbGT%2FdTtI4OePJIXZCfJjVU2BUMM7dgwxlXIhU%3D";
-            var jwt = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY3ODMxODAsImlhdCI6MTcwNjc4MTM4MCwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.t_lAwy-nvDvWspBUv2RCoEkaMENa7MjIS4DdvcOdXGQ";
+            var url = "https://edge3.salomtv.uz:11610/auth-streaming/3,f048c2f0141b30e3fab1a382d2693db34a50ae1a,1706941571,nauman,0-A4684-hls-UNIQCAST,8,8,8,8,8,8,8,8,DESKTOP,318,all,none,default,87.201.183.110/hls/vod/0-A4684-hls-UNIQCAST/playlist.m3u8";
+            var license = "https://edge3.salomtv.uz:11610/drmproxy/wv/license?lat=IkAuKAFqUQmA8j0mvclAkIDxWY6zX0id6Clbv20%2BCm8WoGUNdR9jhdUXYBJjZG0udKDceFXUVRB3WUtICkJPHMJZWggBptDLRYki%2BqBSgox82Sbq7LuQ8UaS91EmuKwGecpauLof2tpfGy1RnSj2Y9yJw3V05ahPjK3IqN0Gv8K2SOcotRDrTmz6YgLBn0HRH3HWzkDOG5rQmx2U6%2FJe1zkuIpjFINMSeSsYAP1M8XAEsX468oMUD1nRqnM%2BEo1l";
+            var jwt = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDY4NTY1NjAsImlhdCI6MTcwNjg1NDc2MCwiaXNzIjoidW5pcUNhc3QiLCJzdWIiOiJhY2Nlc3MiLCJkaWQiOjMxOCwiZHVpZCI6IjJhOTJkM2UwLWI1MmYtMTFlZS05NGFjLTQzYTlmYzVjOWE0NCIsIm9pZCI6MSwib3VpZCI6ImRlZmF1bHQiLCJyaWQiOjEsInJvbGUiOlsic3Vic2NyaWJlciJdLCJydWlkIjoiZGVmYXVsdCIsInVpZCI6MSwidmVyc2lvbiI6Mn0.fjOc2IeMxSyF3My_ZZVQE8u5AJMrXSM1W8nF3-HxrMM";
             player
                 .setSrc(url, {
                 type: "widevine",
