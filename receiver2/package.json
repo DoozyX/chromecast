@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/chromecast-caf-receiver": "^6.0.7"
+    "@types/chromecast-caf-receiver": "^6.0.13"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
@@ -21,7 +21,6 @@
     "@rollup/plugin-typescript": "^11.1.6",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
-    "@types/chromecast-caf-receiver": "^6.0.13",
     "eslint": "^8.56.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
