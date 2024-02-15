@@ -1,7 +1,6 @@
 import commonJs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
-import nodeResolve from "@rollup/plugin-node-resolve";
 
 export default {
     input: "src/index.ts",
@@ -12,6 +11,7 @@ export default {
         name: "CastReceiver",
         globals: {
             '../external/smart-web-player': 'SmartWebPlayer',
+            'smart-web-player': 'SmartWebPlayer',
             'chromecast-caf-receiver': ['cast'],
             'chromecast-caf-receiver/cast.framework': ['cast.framework'],
             'chromecast-caf-receiver/cast.framework.messages': ['cast.framework.messages'],
