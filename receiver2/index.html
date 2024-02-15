@@ -1,19 +1,21 @@
 <html>
 
 <head>
-    <script type="text/javascript" src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js">
-    </script>
+    <script type="text/javascript"
+        src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+    <!-- Cast Debug Logger -->
+    <script src="//www.gstatic.com/cast/sdk/libs/devtools/debug_layer/caf_receiver_logger.js"></script>
+    <!-- Custom Receiver -->
+    <script type="text/javascript" src="build/logger.js"></script>
+    <script type="text/javascript" src="build/smart-web-player.js"></script>
+    <script type="text/javascript" src="build/index.js"></script>
 </head>
 
-<body>
-    <!-- <cast-media-player></cast-media-player> -->
-    <!-- sample image background /> -->
-    <h1 style="color: aliceblue; font-size: 300;">GALIYAAAAA <333 </h1>
-            <img
-                src="https://images.unsplash.com/photo-1682685796852-aa311b46f50d?q=80&w=3540&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
-            <script>
-                cast.framework.CastReceiverContext.getInstance().start();
-            </script>
+<body style="background-color: red;">
+    <h1>TITLE TODO</h1>
+    <div style="width: 100%; height: 100%;">
+        <video style="width: 100%; height: 100%;" id="web_player" controls></video>
+    </div>
 </body>
 
 </html>
