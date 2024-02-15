@@ -55,4 +55,4 @@ declare abstract class BasePlayer {
 
 declare function getSmartPlayer(): BasePlayer;
 
-export { getSmartPlayer };
+export { BasePlayer, type BufferedRange, type Drm, type DrmType, type PlayerEvent, type PlayerEventCallback, type Quality, type Size, type SubtitleTrack, getSmartPlayer };

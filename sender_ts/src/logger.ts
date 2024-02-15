@@ -1,6 +1,4 @@
 class LoggerWriter {
-  private static logger;
-
   public debug(...args: any[]) {
     console.debug(...args);
   }
@@ -18,7 +16,7 @@ class LoggerWriter {
   }
 }
 
-class Logger {
+export class Logger {
   private static logger: LoggerWriter;
   private name: string;
 

@@ -1,3 +1,6 @@
+import "chromecast-caf-sender";
+import { Logger } from "./logger";
+
 // const APP_ID = "72A0DA66";
 const APP_ID = "CE104983";
 
@@ -105,7 +108,7 @@ function getClockTimeString(timestamp: number) {
 
 class PlayerHandler {
   public castPlayer: CastPlayer;
-  public target?: PlayerTarget;
+  public target?: PlayerTarget | null;
   public currentMediaTime?: number;
   public mediaDuration?: number;
   public currentMediaInfo?: any;
@@ -116,38 +119,38 @@ class PlayerHandler {
     this.logger = new Logger("PlayerHandler");
   }
 
-  public setTarget(target) {
+  public setTarget(target: PlayerTarget | null) {
     this.logger.debug("setTarget: ", target);
     this.target = target;
   }
 
   public play() {
     this.logger.debug("play");
-    this.target.play();
+    this.target?.play();
   }
 
   public pause() {
     this.logger.debug("pause");
-    this.target.pause();
+    this.target?.pause();
   }
 
   public stop() {
     this.logger.debug("stop");
-    this.target.stop();
+    this.target?.stop();
   }
 
-  public load(url = null) {
+  public load(url: string) {
     this.logger.debug("load: ", url);
-    this.target.load(url);
+    this.target?.load(url);
   }
 
   /**
    * Check if media has been loaded on the target player.
-   * @param {number?} mediaIndex The desired media index. If null, verify if
+   * @param {number?} url The desired media url. If null, verify if
    *  any media is loaded.
    */
-  public isMediaLoaded(mediaIndex) {
-    return this.target.isMediaLoaded(mediaIndex);
+  public isMediaLoaded(url: string) {
+    return this.target?.isMediaLoaded(url);
   }
 
   /**
@@ -166,54 +169,54 @@ class PlayerHandler {
   }
 
   public getCurrentMediaTime() {
-    return this.target.getCurrentMediaTime();
+    return this.target?.getCurrentMediaTime();
   }
 
   public getMediaDuration() {
-    return this.target.getMediaDuration();
+    return this.target?.getMediaDuration();
   }
 
   public updateDisplay() {
     // Update local variables
-    this.currentMediaTime = this.target.getCurrentMediaTime();
-    this.mediaDuration = this.target.getMediaDuration();
+    this.currentMediaTime = this.target?.getCurrentMediaTime();
+    this.mediaDuration = this.target?.getMediaDuration();
 
-    this.target.updateDisplay();
+    this.target?.updateDisplay();
   }
 
   public updateCurrentTimeDisplay() {
-    this.target.updateCurrentTimeDisplay();
+    this.target?.updateCurrentTimeDisplay();
   }
 
   public updateDurationDisplay() {
-    this.target.updateDurationDisplay();
+    this.target?.updateDurationDisplay();
   }
 
   /**
    * Determines the correct time string (media or clock) and sets it for the given element.
    */
-  public setTimeString(time) {
-    this.target.setTimeString(time);
+  public setTimeString(time: number) {
+    this.target?.setTimeString(time);
   }
 
-  public setVolume(volumeSliderPosition) {
-    this.target.setVolume(volumeSliderPosition);
+  public setVolume(volumeSliderPosition: number) {
+    this.target?.setVolume(volumeSliderPosition);
   }
 
   public mute() {
-    this.target.mute();
+    this.target?.mute();
   }
 
   public unMute() {
-    this.target.unMute();
+    this.target?.unMute();
   }
 
   public isMuted() {
-    return this.target.isMuted();
+    return this.target?.isMuted();
   }
 
-  public seekTo(time) {
-    this.target.seekTo(time);
+  public seekTo(time: number) {
+    this.target?.seekTo(time);
   }
 }
 
@@ -264,22 +267,22 @@ const FULL_VOLUME_HEIGHT = 100;
  *  - Current live variables for controlling UI based on ad playback
  * @struct @constructor
  */
-class CastPlayer {
+export class CastPlayer {
   public logger: Logger;
   public playerHandler: PlayerHandler;
-  public remotePlayer?: cast.framework.RemotePlayer;
-  public remotePlayerController?: cast.framework.RemotePlayerController;
-  public currentMediaTime?: number;
-  public mediaDuration?: number;
-  public timer?: number;
-  public incrementMediaTimeHandler?: Function;
-  public seekMediaListener?: Function;
-  public currentMediaUrl?: string;
+  public remotePlayer?: cast.framework.RemotePlayer | null;
+  public remotePlayerController?: cast.framework.RemotePlayerController | null;
+  public currentMediaTime?: number | null;
+  public mediaDuration?: number | null;
+  public timer?: number | null;
+  public incrementMediaTimeHandler?: Function | null;
+  public seekMediaListener?: Function | null;
+  public currentMediaUrl?: string | null;
 
-  public mediaInfo?: chrome.cast.media.MediaInfo;
-  public liveSeekableRange?: chrome.cast.media.LiveSeekableRange;
-  public isLiveContent?: boolean;
-  public context: cast.framework.CastContext;
+  public mediaInfo?: chrome.cast.media.MediaInfo | null;
+  public liveSeekableRange?: chrome.cast.media.LiveSeekableRange | null;
+  public isLiveContent?: boolean | null;
+  public context!: cast.framework.CastContext;
 
   constructor() {
     /** @type {PlayerHandler} Delegation proxy for media playback */
@@ -358,7 +361,7 @@ class CastPlayer {
     this.stopProgressTimer();
 
     // Session is active
-    if (cast && cast.framework && this.remotePlayer.isConnected) {
+    if (cast && cast.framework && this.remotePlayer?.isConnected) {
       this.setupRemotePlayer();
     }
   }
@@ -370,7 +373,7 @@ class CastPlayer {
   public setupRemotePlayer() {
     this.logger.debug("setupRemotePlayer");
     // Triggers when the media info or the player state changes
-    this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED, (event) => {
+    this.remotePlayerController?.addEventListener(cast.framework.RemotePlayerEventType.MEDIA_INFO_CHANGED, (event) => {
       this.logger.debug("RemotePlayer.MEDIA_INFO_CHANGED", event);
       let session = this.context.getCurrentSession();
       if (!session) {
@@ -401,13 +404,13 @@ class CastPlayer {
       this.playerHandler.updateDisplay();
     });
 
-    this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.CAN_SEEK_CHANGED, (event) => {
+    this.remotePlayerController?.addEventListener(cast.framework.RemotePlayerEventType.CAN_SEEK_CHANGED, (event) => {
       this.logger.debug("RemotePlayer.CAN_SEEK_CHANGED" + event);
     });
 
-    this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED, () => {
-      this.logger.debug("RemotePlayer.IS_PAUSED_CHANGED", this.remotePlayer.isPaused);
-      if (this.remotePlayer.isPaused) {
+    this.remotePlayerController?.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED, () => {
+      this.logger.debug("RemotePlayer.IS_PAUSED_CHANGED", this.remotePlayer?.isPaused);
+      if (this.remotePlayer?.isPaused) {
         this.playerHandler.pause();
       } else {
         // If currently not playing, start to play.
@@ -417,20 +420,20 @@ class CastPlayer {
       }
     });
 
-    this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED, () => {
-      this.logger.debug("RemotePlayer.IS_MUTED_CHANGED", this.remotePlayer.isMuted);
-      if (this.remotePlayer.isMuted) {
+    this.remotePlayerController?.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED, () => {
+      this.logger.debug("RemotePlayer.IS_MUTED_CHANGED", this.remotePlayer?.isMuted);
+      if (this.remotePlayer?.isMuted) {
         this.playerHandler.mute();
       } else {
         this.playerHandler.unMute();
       }
     });
 
-    this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED, () => {
-      this.logger.debug("RemotePlayer.VOLUME_LEVEL_CHANGED", this.remotePlayer.volumeLevel);
+    this.remotePlayerController?.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED, () => {
+      this.logger.debug("RemotePlayer.VOLUME_LEVEL_CHANGED", this.remotePlayer?.volumeLevel);
     });
 
-    this.remotePlayerController.addEventListener(
+    this.remotePlayerController?.addEventListener(
       cast.framework.RemotePlayerEventType.LIVE_SEEKABLE_RANGE_CHANGED,
       (event) => {
         console.log("LIVE_SEEKABLE_RANGE_CHANGED");
@@ -442,9 +445,8 @@ class CastPlayer {
       private remotePlayer: cast.framework.RemotePlayer;
       private remotePlayerController: cast.framework.RemotePlayerController;
       private currentMediaTime: number;
-      private mediaInfo: chrome.cast.media.MediaInfo;
+      private mediaInfo: chrome.cast.media.MediaInfo | null;
       private isLiveContent: boolean;
-      public castPlayer: CastPlayer;
       public target?: PlayerTarget;
       public currentMediaInfo?: any;
       public playerHandler: PlayerHandler;
@@ -535,7 +537,7 @@ class CastPlayer {
 
         this.context
           .getCurrentSession()
-          .loadMedia(request)
+          ?.loadMedia(request)
           .then(
             () => {
               console.log("Remote media loaded");
@@ -547,7 +549,7 @@ class CastPlayer {
           );
       }
 
-      public isMediaLoaded(mediaIndex) {
+      public isMediaLoaded(url: string) {
         let session = this.context.getCurrentSession();
         if (!session) return false;
 
@@ -563,7 +565,7 @@ class CastPlayer {
        *      media time even if in clock time (conversion done when displaying).
        */
       public getCurrentMediaTime() {
-        if (this.isLiveContent && this.mediaInfo.metadata && this.mediaInfo.metadata.sectionStartTimeInMedia) {
+        if (this.isLiveContent && this.mediaInfo?.metadata && this.mediaInfo.metadata.sectionStartTimeInMedia) {
           return this.remotePlayer.currentTime - this.mediaInfo.metadata.sectionStartTimeInMedia;
         } else {
           // VOD and live scenerios where live metadata is not provided.
@@ -579,7 +581,7 @@ class CastPlayer {
         if (this.isLiveContent) {
           // Scenerios when live metadata is not provided.
           if (
-            this.mediaInfo.metadata == undefined ||
+            this.mediaInfo?.metadata == undefined ||
             this.mediaInfo.metadata.sectionDuration == undefined ||
             this.mediaInfo.metadata.sectionStartTimeInMedia == undefined
           ) {
@@ -594,13 +596,13 @@ class CastPlayer {
 
       public updateDisplay() {
         let castSession = this.context.getCurrentSession();
-        if (castSession && castSession.getMediaSession() && castSession.getMediaSession().media) {
+        if (castSession && castSession.getMediaSession() && castSession.getMediaSession()?.media) {
           let media = castSession.getMediaSession();
-          let mediaInfo = media.media;
+          let mediaInfo = media?.media;
 
           // image placeholder for video view
-          let previewImage: string = null;
-          if (mediaInfo.metadata && mediaInfo.metadata.images && mediaInfo.metadata.images.length > 0) {
+          let previewImage: string | null = null;
+          if (mediaInfo?.metadata && mediaInfo.metadata.images && mediaInfo.metadata.images.length > 0) {
             previewImage = mediaInfo.metadata.images[0].url;
           } else {
             previewImage = null;
@@ -612,7 +614,7 @@ class CastPlayer {
 
           let mediaState = mediaTitle + " on " + castSession.getCastDevice().friendlyName;
 
-          if (mediaInfo.metadata) {
+          if (mediaInfo?.metadata) {
             mediaTitle = mediaInfo.metadata.title;
             mediaEpisodeTitle = mediaInfo.metadata.episodeTitle;
             // Append episode title if present
@@ -626,20 +628,20 @@ class CastPlayer {
       }
 
       public updateCurrentTimeDisplay() {
-        this.playerHandler.setTimeString(this.playerHandler.getCurrentMediaTime());
+        this.playerHandler.setTimeString(this.playerHandler.getCurrentMediaTime() ?? 0);
       }
 
       public updateDurationDisplay() {
-        this.playerHandler.setTimeString(this.playerHandler.getMediaDuration());
+        this.playerHandler.setTimeString(this.playerHandler.getMediaDuration() ?? 0);
       }
 
-      public setTimeString(time) {
+      public setTimeString(time: number) {
         let currentTimeString = getMediaTimeString(time);
         // TODO
       }
 
       // 0 to 1
-      public setVolume(volume) {
+      public setVolume(volume: number) {
         this.remotePlayer.volumeLevel = volume;
         this.remotePlayerController.setVolumeLevel();
       }
@@ -660,7 +662,7 @@ class CastPlayer {
         return this.remotePlayer.isMuted;
       }
 
-      public seekTo(time) {
+      public seekTo(time: number) {
         this.remotePlayer.currentTime = time;
         this.remotePlayerController.seek();
       }
@@ -671,15 +673,15 @@ class CastPlayer {
     // to remote playback.
     var playerTarget = new RemoteTarget(
       this.playerHandler,
-      this.remotePlayer,
-      this.remotePlayerController,
+      this.remotePlayer!,
+      this.remotePlayerController!,
       this.context,
     );
 
     this.playerHandler.setTarget(playerTarget);
 
     // Setup remote player properties on setup
-    if (this.remotePlayer.isMuted) {
+    if (this.remotePlayer?.isMuted) {
       this.playerHandler.mute();
     }
 
@@ -688,11 +690,11 @@ class CastPlayer {
 
     // If resuming a session, take the remote properties and continue the existing
     // playback. Otherwise, load local content.
-    if (this.context.getCurrentSession().getSessionState() == cast.framework.SessionState.SESSION_RESUMED) {
+    if (this.context.getCurrentSession()?.getSessionState() == cast.framework.SessionState.SESSION_RESUMED) {
       console.log("Resuming session");
       this.playerHandler.prepareToPlay();
     } else {
-      this.playerHandler.load();
+      // this.playerHandler.load(url);
     }
   }
 
@@ -720,7 +722,7 @@ class CastPlayer {
    * @param {Event} event An event object from seek
    */
   public seekMedia(seekTime: number) {
-    if (this.mediaDuration == null || (this.context.getCurrentSession() && !this.remotePlayer.canSeek)) {
+    if (this.mediaDuration == null || (this.context.getCurrentSession() && !this.remotePlayer?.canSeek)) {
       console.log("Error - Not seekable");
       return;
     }
@@ -733,7 +735,7 @@ class CastPlayer {
     this.currentMediaTime = seekTime;
 
     if (this.isLiveContent) {
-      seekTime += this.mediaInfo.metadata.sectionStartTimeInMedia;
+      seekTime += this.mediaInfo?.metadata.sectionStartTimeInMedia;
     }
 
     this.playerHandler.seekTo(seekTime);
@@ -754,18 +756,18 @@ class CastPlayer {
     this.stopProgressTimer();
 
     // Start progress timer
-    this.timer = setInterval(this.incrementMediaTimeHandler, TIMER_STEP);
+    this.timer = setInterval(this.incrementMediaTimeHandler!, TIMER_STEP);
   }
 
   /**
    * Stops the timer to increment the media progress bar
    */
-  public stopProgressTimer = function () {
+  public stopProgressTimer() {
     if (this.timer) {
       clearInterval(this.timer);
       this.timer = null;
     }
-  };
+  }
 
   /**
    * Increment media current time depending on remote or local playback
@@ -777,7 +779,7 @@ class CastPlayer {
 
     this.playerHandler.updateDurationDisplay();
 
-    if (this.mediaDuration == null || this.currentMediaTime < this.mediaDuration || this.isLiveContent) {
+    if (this.mediaDuration == null || this.currentMediaTime! < this.mediaDuration || this.isLiveContent) {
       this.playerHandler.updateCurrentTimeDisplay();
       this.updateProgressBarByTimer();
     } else if (this.mediaDuration > 0) {
@@ -803,16 +805,16 @@ class CastPlayer {
       if (this.liveSeekableRange) {
         // Use the liveSeekableRange to draw the seekable and unseekable windows
         let seekableMediaPosition =
-          Math.max(this.mediaInfo.metadata.sectionStartTimeInMedia, this.liveSeekableRange.end) -
-          this.mediaInfo.metadata.sectionStartTimeInMedia;
+          Math.max(this.mediaInfo?.metadata.sectionStartTimeInMedia, this.liveSeekableRange.end!) -
+          this.mediaInfo?.metadata.sectionStartTimeInMedia;
 
         let unseekableMediaPosition =
-          Math.max(this.mediaInfo.metadata.sectionStartTimeInMedia, this.liveSeekableRange.start) -
-          this.mediaInfo.metadata.sectionStartTimeInMedia;
+          Math.max(this.mediaInfo?.metadata.sectionStartTimeInMedia, this.liveSeekableRange.start!) -
+          this.mediaInfo?.metadata.sectionStartTimeInMedia;
       }
     }
 
-    var pp = Math.floor(this.currentMediaTime / this.mediaDuration);
+    var pp = Math.floor(this.currentMediaTime! / this.mediaDuration);
     if (pp > 1) {
       pp = 1;
     } else if (pp < 0) {
@@ -838,7 +840,7 @@ class CastPlayer {
    * @param {chrome.cast.Error} error
    * @return {string} error message
    */
-  public static getErrorMessage(error) {
+  public static getErrorMessage(error: chrome.cast.Error) {
     switch (error.code) {
       case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
         return "The API is not initialized." + (error.description ? " :" + error.description : "");
