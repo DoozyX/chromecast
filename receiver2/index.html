@@ -6,16 +6,24 @@
     <!-- Cast Debug Logger -->
     <script src="//www.gstatic.com/cast/sdk/libs/devtools/debug_layer/caf_receiver_logger.js"></script>
     <!-- Custom Receiver -->
-    <script type="text/javascript" src="build/logger.js"></script>
-    <script type="text/javascript" src="build/smart-web-player.js"></script>
-    <script type="text/javascript" src="build/index.js"></script>
+    <script type="text/javascript" src="external/smart-web-player.min.js"></script>
+    <script type="text/javascript" src="dist/bundle.js"></script>
 </head>
 
 <body style="background-color: red;">
-    <h1>TITLE TODO</h1>
+    <h1>HJELL</h1>
     <div style="width: 100%; height: 100%;">
         <video style="width: 100%; height: 100%;" id="web_player" controls></video>
     </div>
+    <script>
+
+        // Create new sample Receiver.
+        const receiver = new CastReceiver.CastReceiver();
+
+        // Start receiving requests from senders.
+        receiver.start();
+
+    </script>
 </body>
 
 </html>
