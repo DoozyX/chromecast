@@ -16,30 +16,26 @@ window.onload = function () {
     const license = (document.getElementById("license") as HTMLInputElement).value;
     const jwt = (document.getElementById("jwt") as HTMLInputElement).value;
     if (license.length > 0 && jwt.length > 0) {
-      // castPlayer.playerHandler.load(url, {
-      //   type: "widevine",
-      //   data: {
-      //     licenseUrl: license,
-      //   },
-      //   headers: {
-      //     Authorization: jwt,
-      //   },
-      // });
+      castPlayer.player.load(url, {
+        licenseUrl: license,
+        jwt,
+      });
+    } else {
+      castPlayer.player.load(url);
     }
-    castPlayer.playerHandler.load(url);
   });
 
   document.getElementById("play")?.addEventListener("click", () => {
-    castPlayer.playerHandler.play();
+    castPlayer.player.play();
   });
 
   document.getElementById("pause")?.addEventListener("click", () => {
-    castPlayer.playerHandler.pause();
+    castPlayer.player.pause();
   });
 
   document.getElementById("seek")?.addEventListener("click", () => {
     const position = (document.getElementById("position") as HTMLInputElement).value;
 
-    castPlayer.playerHandler.seekTo(parseInt(position));
+    castPlayer.player.seekTo(parseInt(position));
   });
 };

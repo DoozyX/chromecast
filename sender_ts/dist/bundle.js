@@ -37,8 +37,14 @@
         }
     }
 
-    // const APP_ID = "72A0DA66";
+    // export const APP_ID = "72A0DA66";
     const APP_ID = "CE104983";
+    /**
+     * Time in milliseconds for minimal progress update.
+     * @const {number}
+     */
+    const TIMER_STEP = 1000;
+
     /**
      * @param {?number} timestamp Linux timestamp
      * @return {?string} media time string. Null if time is invalid.
@@ -66,114 +72,205 @@
             secondsText = "0" + seconds;
         return (isNegative ? "-" : "") + hoursText + ":" + minutesText + ":" + secondsText;
     }
-    class PlayerHandler {
-        constructor(castPlayer) {
-            this.target = null;
-            this.castPlayer = castPlayer;
-            this.logger = new Logger("PlayerHandler");
+    /**
+     * Makes human-readable message from chrome.cast.Error
+     * @param {chrome.cast.Error} error
+     * @return {string} error message
+     */
+    function getErrorMessage(error) {
+        switch (error.code) {
+            case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
+                return "The API is not initialized." + (error.description ? " :" + error.description : "");
+            case chrome.cast.ErrorCode.CANCEL:
+                return "The operation was canceled by the user" + (error.description ? " :" + error.description : "");
+            case chrome.cast.ErrorCode.CHANNEL_ERROR:
+                return "A channel to the receiver is not available." + (error.description ? " :" + error.description : "");
+            case chrome.cast.ErrorCode.EXTENSION_MISSING:
+                return "The Cast extension is not available." + (error.description ? " :" + error.description : "");
+            case chrome.cast.ErrorCode.INVALID_PARAMETER:
+                return "The parameters to the operation were not valid." + (error.description ? " :" + error.description : "");
+            case chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE:
+                return ("No receiver was compatible with the session request." + (error.description ? " :" + error.description : ""));
+            case chrome.cast.ErrorCode.SESSION_ERROR:
+                return ("A session could not be created, or a session was invalid." +
+                    (error.description ? " :" + error.description : ""));
+            case chrome.cast.ErrorCode.TIMEOUT:
+                return "The operation timed out." + (error.description ? " :" + error.description : "");
+            default:
+                return error;
         }
-        setTarget(target) {
-            this.logger.debug("setTarget: ", target);
-            this.target = target;
+    }
+
+    class RemoteTarget {
+        constructor(remotePlayer, remotePlayerController, context) {
+            this.remotePlayer = remotePlayer;
+            this.remotePlayerController = remotePlayerController;
+            this.currentMediaTime = 0;
+            this.mediaInfo = null;
+            this.isLiveContent = false;
+            this.context = context;
         }
         play() {
-            var _a;
-            this.logger.debug("play");
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.play();
+            if (this.remotePlayer.isPaused) {
+                this.remotePlayerController.playOrPause();
+            }
         }
         pause() {
-            var _a;
-            this.logger.debug("pause");
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.pause();
+            if (!this.remotePlayer.isPaused) {
+                this.remotePlayerController.playOrPause();
+            }
         }
         stop() {
-            var _a;
-            this.logger.debug("stop");
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.stop();
+            this.remotePlayerController.stop();
         }
-        load(url) {
+        // Load request for local -> remote
+        load(url, drm) {
             var _a;
-            this.logger.debug("load: ", url);
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.load(url);
+            console.log("Loading...", url, drm);
+            let mediaInfo = new chrome.cast.media.MediaInfo(url, "");
+            if (drm) {
+                mediaInfo.customData = { drm };
+            }
+            mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+            mediaInfo.metadata.title = "TODO TITLE";
+            mediaInfo.metadata.subtitle = "TODO SUBTITLE";
+            // mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
+            // mediaInfo.metadata.images = [
+            //   {
+            //     url: MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]["thumb"],
+            //   },
+            // ];
+            // Change the streamType and add live specific metadata.
+            // mediaInfo.streamType = chrome.cast.media.StreamType.LIVE;
+            // TODO: Set the metadata on the receiver side in your implementation.
+            // startAbsoluteTime and sectionStartTimeInMedia will be set for you.
+            // See https://developers.google.com/cast/docs/caf_receiver/live.
+            // TODO: Start time, is a fake timestamp. Use correct values for your implementation.
+            // let currentTime = new Date();
+            // Convert from milliseconds to seconds.
+            // let miliseconds = currentTime.getTime() / 1000;
+            // let sectionStartAbsoluteTime = miliseconds;
+            // Duration should be -1 for live streams.
+            // mediaInfo.duration = -1;
+            // TODO: Set on the receiver for your implementation.
+            //   mediaInfo.startAbsoluteTime = miliseconds; TODO
+            // mediaInfo.metadata.sectionStartAbsoluteTime = sectionStartAbsoluteTime;
+            // TODO: Set on the receiver for your implementation.
+            // mediaInfo.metadata.sectionStartTimeInMedia = 0;
+            // mediaInfo.metadata.sectionDuration = 100; // TODO Duration;
+            let request = new chrome.cast.media.LoadRequest(mediaInfo);
+            request.currentTime = this.currentMediaTime;
+            request.autoplay = true;
+            (_a = this.context
+                .getCurrentSession()) === null || _a === void 0 ? void 0 : _a.loadMedia(request).then(() => {
+                console.log("Remote media loaded");
+            }, (errorCode) => {
+                console.log("Remote media load error: " + getErrorMessage(errorCode));
+                //   this.playerHandler.updateDisplay();
+            });
         }
-        /**
-         * Check if media has been loaded on the target player.
-         * @param {number?} url The desired media url. If null, verify if
-         *  any media is loaded.
-         */
         isMediaLoaded(url) {
-            var _a;
-            return (_a = this.target) === null || _a === void 0 ? void 0 : _a.isMediaLoaded(url);
+            let session = this.context.getCurrentSession();
+            if (!session)
+                return false;
+            let media = session.getMediaSession();
+            if (!media)
+                return false;
+            // No need to verify local mediaIndex content.
+            return true;
         }
         /**
-         * Called after media has been successfully loaded and is ready to start playback.
-         * When local, will start playing the video, start the timer, and update the UI.
-         * When remote, will set the UI to PLAYING and start the timer to update the
-         *   UI based on remote playback.
+         * @return {number?} Current media time for the content. Always returns
+         *      media time even if in clock time (conversion done when displaying).
          */
-        prepareToPlay() {
-            this.castPlayer.mediaDuration = this.getMediaDuration();
-            this.castPlayer.playerHandler.updateDurationDisplay();
-            this.play();
-            this.castPlayer.startProgressTimer();
-            this.updateDisplay();
-        }
         getCurrentMediaTime() {
             var _a;
-            return (_a = this.target) === null || _a === void 0 ? void 0 : _a.getCurrentMediaTime();
+            if (this.isLiveContent && ((_a = this.mediaInfo) === null || _a === void 0 ? void 0 : _a.metadata) && this.mediaInfo.metadata.sectionStartTimeInMedia) {
+                return this.remotePlayer.currentTime - this.mediaInfo.metadata.sectionStartTimeInMedia;
+            }
+            else {
+                // VOD and live scenerios where live metadata is not provided.
+                return this.remotePlayer.currentTime;
+            }
         }
+        /**
+         * @return {number?} media time duration for the content. Always returns
+         *      media time even if in clock time (conversion done when displaying).
+         */
         getMediaDuration() {
             var _a;
-            return (_a = this.target) === null || _a === void 0 ? void 0 : _a.getMediaDuration();
+            if (this.isLiveContent) {
+                // Scenerios when live metadata is not provided.
+                if (((_a = this.mediaInfo) === null || _a === void 0 ? void 0 : _a.metadata) == undefined ||
+                    this.mediaInfo.metadata.sectionDuration == undefined ||
+                    this.mediaInfo.metadata.sectionStartTimeInMedia == undefined) {
+                    return null;
+                }
+                return this.mediaInfo.metadata.sectionDuration;
+            }
+            else {
+                return this.remotePlayer.duration;
+            }
         }
         updateDisplay() {
-            var _a, _b, _c;
-            // Update local variables
-            this.currentMediaTime = (_a = this.target) === null || _a === void 0 ? void 0 : _a.getCurrentMediaTime();
-            this.mediaDuration = (_b = this.target) === null || _b === void 0 ? void 0 : _b.getMediaDuration();
-            (_c = this.target) === null || _c === void 0 ? void 0 : _c.updateDisplay();
+            var _a;
+            let castSession = this.context.getCurrentSession();
+            if (castSession && castSession.getMediaSession() && ((_a = castSession.getMediaSession()) === null || _a === void 0 ? void 0 : _a.media)) {
+                let media = castSession.getMediaSession();
+                let mediaInfo = media === null || media === void 0 ? void 0 : media.media;
+                if ((mediaInfo === null || mediaInfo === void 0 ? void 0 : mediaInfo.metadata) && mediaInfo.metadata.images && mediaInfo.metadata.images.length > 0) {
+                    mediaInfo.metadata.images[0].url;
+                }
+                let mediaTitle = "";
+                let mediaEpisodeTitle = "";
+                mediaTitle + " on " + castSession.getCastDevice().friendlyName;
+                if (mediaInfo === null || mediaInfo === void 0 ? void 0 : mediaInfo.metadata) {
+                    mediaTitle = mediaInfo.metadata.title;
+                    mediaEpisodeTitle = mediaInfo.metadata.episodeTitle;
+                    // Append episode title if present
+                    mediaTitle = mediaEpisodeTitle ? mediaTitle + ": " + mediaEpisodeTitle : mediaTitle;
+                    // Do not display mediaTitle if not defined.
+                    mediaTitle = mediaTitle ? mediaTitle + " " : "";
+                    mediaInfo.metadata.subtitle;
+                }
+            }
         }
         updateCurrentTimeDisplay() {
             var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.updateCurrentTimeDisplay();
+            this.setTimeString((_a = this.getCurrentMediaTime()) !== null && _a !== void 0 ? _a : 0);
         }
         updateDurationDisplay() {
             var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.updateDurationDisplay();
+            this.setTimeString((_a = this.getMediaDuration()) !== null && _a !== void 0 ? _a : 0);
         }
-        /**
-         * Determines the correct time string (media or clock) and sets it for the given element.
-         */
         setTimeString(time) {
-            var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.setTimeString(time);
+            getMediaTimeString(time);
+            // TODO
         }
-        setVolume(volumeSliderPosition) {
-            var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.setVolume(volumeSliderPosition);
+        // 0 to 1
+        setVolume(volume) {
+            this.remotePlayer.volumeLevel = volume;
+            this.remotePlayerController.setVolumeLevel();
         }
         mute() {
-            var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.mute();
+            if (!this.remotePlayer.isMuted) {
+                this.remotePlayerController.muteOrUnmute();
+            }
         }
         unMute() {
-            var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.unMute();
+            if (this.remotePlayer.isMuted) {
+                this.remotePlayerController.muteOrUnmute();
+            }
         }
         isMuted() {
-            var _a;
-            return (_a = this.target) === null || _a === void 0 ? void 0 : _a.isMuted();
+            return this.remotePlayer.isMuted;
         }
         seekTo(time) {
-            var _a;
-            (_a = this.target) === null || _a === void 0 ? void 0 : _a.seekTo(time);
+            this.remotePlayer.currentTime = time;
+            this.remotePlayerController.seek();
         }
     }
-    /**
-     * Time in milliseconds for minimal progress update.
-     * @const {number}
-     */
-    const TIMER_STEP = 1000;
+
     /**
      * Cast player object
      * Main variables:
@@ -187,7 +284,7 @@
     class CastPlayer {
         constructor() {
             /** @type {PlayerHandler} Delegation proxy for media playback */
-            this.playerHandler = new PlayerHandler(this);
+            // this.player = null;
             /* Cast player variables */
             /** @type {cast.framework.RemotePlayer} */
             this.remotePlayer = null;
@@ -238,21 +335,22 @@
             this.remotePlayer = new cast.framework.RemotePlayer();
             this.remotePlayerController = new cast.framework.RemotePlayerController(this.remotePlayer);
             this.remotePlayerController.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, (e) => {
+                var _a;
                 this.logger.debug("RemotePlayerController.IS_CONNECTED_CHANGED");
-                this.switchPlayer();
+                this.stopProgressTimer();
+                // Session is active
+                if (cast && cast.framework && ((_a = this.remotePlayer) === null || _a === void 0 ? void 0 : _a.isConnected)) {
+                    this.setupRemotePlayer();
+                }
             });
+            this.player = new RemoteTarget(this.remotePlayer, this.remotePlayerController, this.context);
         }
-        /**
-         * Switch between the remote and local players.
-         */
-        switchPlayer() {
-            var _a;
-            this.logger.debug("switchPlayer");
-            this.stopProgressTimer();
-            // Session is active
-            if (cast && cast.framework && ((_a = this.remotePlayer) === null || _a === void 0 ? void 0 : _a.isConnected)) {
-                this.setupRemotePlayer();
-            }
+        prepareToPlay() {
+            this.mediaDuration = this.player.getMediaDuration();
+            this.player.updateDurationDisplay();
+            this.player.play();
+            this.startProgressTimer();
+            this.player.updateDisplay();
         }
         /**
          * Set the PlayerHandler target to use the remote player
@@ -268,14 +366,14 @@
                 if (!session) {
                     this.mediaInfo = null;
                     this.isLiveContent = false;
-                    this.playerHandler.updateDisplay();
+                    this.player.updateDisplay();
                     return;
                 }
                 let media = session.getMediaSession();
                 if (!media) {
                     this.mediaInfo = null;
                     this.isLiveContent = false;
-                    this.playerHandler.updateDisplay();
+                    this.player.updateDisplay();
                     return;
                 }
                 this.mediaInfo = media.media;
@@ -285,33 +383,33 @@
                 else {
                     this.isLiveContent = false;
                 }
-                this.playerHandler.prepareToPlay();
-                this.playerHandler.updateDisplay();
+                this.prepareToPlay();
+                this.player.updateDisplay();
             });
             (_b = this.remotePlayerController) === null || _b === void 0 ? void 0 : _b.addEventListener(cast.framework.RemotePlayerEventType.CAN_SEEK_CHANGED, (event) => {
-                this.logger.debug("RemotePlayer.CAN_SEEK_CHANGED" + event);
+                this.logger.debug("RemotePlayer.CAN_SEEK_CHANGED", event);
             });
             (_c = this.remotePlayerController) === null || _c === void 0 ? void 0 : _c.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED, () => {
                 var _a, _b;
                 this.logger.debug("RemotePlayer.IS_PAUSED_CHANGED", (_a = this.remotePlayer) === null || _a === void 0 ? void 0 : _a.isPaused);
                 if ((_b = this.remotePlayer) === null || _b === void 0 ? void 0 : _b.isPaused) {
-                    this.playerHandler.pause();
+                    this.player.pause();
                 }
                 else {
                     // If currently not playing, start to play.
                     // This occurs if starting to play from local, but this check is
                     // required if the state is changed remotely.
-                    this.playerHandler.play();
+                    this.player.play();
                 }
             });
             (_d = this.remotePlayerController) === null || _d === void 0 ? void 0 : _d.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED, () => {
                 var _a, _b;
                 this.logger.debug("RemotePlayer.IS_MUTED_CHANGED", (_a = this.remotePlayer) === null || _a === void 0 ? void 0 : _a.isMuted);
                 if ((_b = this.remotePlayer) === null || _b === void 0 ? void 0 : _b.isMuted) {
-                    this.playerHandler.mute();
+                    this.player.mute();
                 }
                 else {
-                    this.playerHandler.unMute();
+                    this.player.unMute();
                 }
             });
             (_e = this.remotePlayerController) === null || _e === void 0 ? void 0 : _e.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED, () => {
@@ -322,163 +420,9 @@
                 console.log("LIVE_SEEKABLE_RANGE_CHANGED");
                 this.liveSeekableRange = event.value;
             });
-            class RemoteTarget {
-                constructor(playerHandler, remotePlayer, remotePlayerController, context) {
-                    this.remotePlayer = remotePlayer;
-                    this.remotePlayerController = remotePlayerController;
-                    this.currentMediaTime = 0;
-                    this.mediaInfo = null;
-                    this.isLiveContent = false;
-                    this.playerHandler = playerHandler;
-                    this.context = context;
-                }
-                play() {
-                    if (this.remotePlayer.isPaused) {
-                        this.remotePlayerController.playOrPause();
-                    }
-                }
-                pause() {
-                    if (!this.remotePlayer.isPaused) {
-                        this.remotePlayerController.playOrPause();
-                    }
-                }
-                stop() {
-                    this.remotePlayerController.stop();
-                }
-                // Load request for local -> remote
-                load(url) {
-                    var _a;
-                    console.log("Loading..." + url);
-                    let mediaInfo = new chrome.cast.media.MediaInfo(url, "video/mp4");
-                    mediaInfo.streamType = chrome.cast.media.StreamType.BUFFERED;
-                    mediaInfo.metadata = new chrome.cast.media.TvShowMediaMetadata();
-                    mediaInfo.metadata.title = "TODO TITLE";
-                    mediaInfo.metadata.subtitle = "TODO SUBTITLE";
-                    // mediaInfo.metadata.images = [
-                    //   {
-                    //     url: MEDIA_SOURCE_ROOT + this.mediaContents[mediaIndex]["thumb"],
-                    //   },
-                    // ];
-                    let request = new chrome.cast.media.LoadRequest(mediaInfo);
-                    request.currentTime = this.currentMediaTime;
-                    request.autoplay = true;
-                    (_a = this.context
-                        .getCurrentSession()) === null || _a === void 0 ? void 0 : _a.loadMedia(request).then(() => {
-                        console.log("Remote media loaded");
-                    }, (errorCode) => {
-                        console.log("Remote media load error: " + CastPlayer.getErrorMessage(errorCode));
-                        //   this.playerHandler.updateDisplay();
-                    });
-                }
-                isMediaLoaded(url) {
-                    let session = this.context.getCurrentSession();
-                    if (!session)
-                        return false;
-                    let media = session.getMediaSession();
-                    if (!media)
-                        return false;
-                    // No need to verify local mediaIndex content.
-                    return true;
-                }
-                /**
-                 * @return {number?} Current media time for the content. Always returns
-                 *      media time even if in clock time (conversion done when displaying).
-                 */
-                getCurrentMediaTime() {
-                    var _a;
-                    if (this.isLiveContent && ((_a = this.mediaInfo) === null || _a === void 0 ? void 0 : _a.metadata) && this.mediaInfo.metadata.sectionStartTimeInMedia) {
-                        return this.remotePlayer.currentTime - this.mediaInfo.metadata.sectionStartTimeInMedia;
-                    }
-                    else {
-                        // VOD and live scenerios where live metadata is not provided.
-                        return this.remotePlayer.currentTime;
-                    }
-                }
-                /**
-                 * @return {number?} media time duration for the content. Always returns
-                 *      media time even if in clock time (conversion done when displaying).
-                 */
-                getMediaDuration() {
-                    var _a;
-                    if (this.isLiveContent) {
-                        // Scenerios when live metadata is not provided.
-                        if (((_a = this.mediaInfo) === null || _a === void 0 ? void 0 : _a.metadata) == undefined ||
-                            this.mediaInfo.metadata.sectionDuration == undefined ||
-                            this.mediaInfo.metadata.sectionStartTimeInMedia == undefined) {
-                            return null;
-                        }
-                        return this.mediaInfo.metadata.sectionDuration;
-                    }
-                    else {
-                        return this.remotePlayer.duration;
-                    }
-                }
-                updateDisplay() {
-                    var _a;
-                    let castSession = this.context.getCurrentSession();
-                    if (castSession && castSession.getMediaSession() && ((_a = castSession.getMediaSession()) === null || _a === void 0 ? void 0 : _a.media)) {
-                        let media = castSession.getMediaSession();
-                        let mediaInfo = media === null || media === void 0 ? void 0 : media.media;
-                        if ((mediaInfo === null || mediaInfo === void 0 ? void 0 : mediaInfo.metadata) && mediaInfo.metadata.images && mediaInfo.metadata.images.length > 0) {
-                            mediaInfo.metadata.images[0].url;
-                        }
-                        let mediaTitle = "";
-                        let mediaEpisodeTitle = "";
-                        mediaTitle + " on " + castSession.getCastDevice().friendlyName;
-                        if (mediaInfo === null || mediaInfo === void 0 ? void 0 : mediaInfo.metadata) {
-                            mediaTitle = mediaInfo.metadata.title;
-                            mediaEpisodeTitle = mediaInfo.metadata.episodeTitle;
-                            // Append episode title if present
-                            mediaTitle = mediaEpisodeTitle ? mediaTitle + ": " + mediaEpisodeTitle : mediaTitle;
-                            // Do not display mediaTitle if not defined.
-                            mediaTitle = mediaTitle ? mediaTitle + " " : "";
-                            mediaInfo.metadata.subtitle;
-                        }
-                    }
-                }
-                updateCurrentTimeDisplay() {
-                    var _a;
-                    this.playerHandler.setTimeString((_a = this.playerHandler.getCurrentMediaTime()) !== null && _a !== void 0 ? _a : 0);
-                }
-                updateDurationDisplay() {
-                    var _a;
-                    this.playerHandler.setTimeString((_a = this.playerHandler.getMediaDuration()) !== null && _a !== void 0 ? _a : 0);
-                }
-                setTimeString(time) {
-                    getMediaTimeString(time);
-                    // TODO
-                }
-                // 0 to 1
-                setVolume(volume) {
-                    this.remotePlayer.volumeLevel = volume;
-                    this.remotePlayerController.setVolumeLevel();
-                }
-                mute() {
-                    if (!this.remotePlayer.isMuted) {
-                        this.remotePlayerController.muteOrUnmute();
-                    }
-                }
-                unMute() {
-                    if (this.remotePlayer.isMuted) {
-                        this.remotePlayerController.muteOrUnmute();
-                    }
-                }
-                isMuted() {
-                    return this.remotePlayer.isMuted;
-                }
-                seekTo(time) {
-                    this.remotePlayer.currentTime = time;
-                    this.remotePlayerController.seek();
-                }
-            }
-            // This object will implement PlayerHandler callbacks with
-            // remotePlayerController, and makes necessary UI updates specific
-            // to remote playback.
-            var playerTarget = new RemoteTarget(this.playerHandler, this.remotePlayer, this.remotePlayerController, this.context);
-            this.playerHandler.setTarget(playerTarget);
             // Setup remote player properties on setup
             if ((_g = this.remotePlayer) === null || _g === void 0 ? void 0 : _g.isMuted) {
-                this.playerHandler.mute();
+                this.player.mute();
             }
             // The remote player may have had a volume set from previous playback
             // TODO update volume
@@ -486,7 +430,7 @@
             // playback. Otherwise, load local content.
             if (((_h = this.context.getCurrentSession()) === null || _h === void 0 ? void 0 : _h.getSessionState()) == cast.framework.SessionState.SESSION_RESUMED) {
                 console.log("Resuming session");
-                this.playerHandler.prepareToPlay();
+                this.prepareToPlay();
             }
         }
         /**
@@ -496,14 +440,12 @@
         selectMedias(url) {
             console.log("Media index selected: " + url);
             this.currentMediaUrl = url;
-            // Clear currentMediaInfo when playing content from the sender.
-            this.playerHandler.currentMediaInfo = undefined;
             // Stop timer and reset time displays
             this.stopProgressTimer();
             this.currentMediaTime = 0;
-            this.playerHandler.setTimeString(0);
-            this.playerHandler.setTimeString(0);
-            this.playerHandler.play();
+            this.player.setTimeString(0);
+            this.player.setTimeString(0);
+            this.player.play();
         }
         /**
          * Media seek function
@@ -523,14 +465,14 @@
             if (this.isLiveContent) {
                 seekTime += (_b = this.mediaInfo) === null || _b === void 0 ? void 0 : _b.metadata.sectionStartTimeInMedia;
             }
-            this.playerHandler.seekTo(seekTime);
+            this.player.seekTo(seekTime);
         }
         /**
          * Set current player volume
          * @param {Event} mouseEvent
          */
         setVolume(pos) {
-            this.playerHandler.setVolume(pos);
+            this.player.setVolume(pos);
         }
         /**
          * Starts the timer to increment the media progress bar
@@ -554,11 +496,11 @@
          */
         incrementMediaTime() {
             // First sync with the current player's time
-            this.currentMediaTime = this.playerHandler.getCurrentMediaTime();
-            this.mediaDuration = this.playerHandler.getMediaDuration();
-            this.playerHandler.updateDurationDisplay();
+            this.currentMediaTime = this.player.getCurrentMediaTime();
+            this.mediaDuration = this.player.getMediaDuration();
+            this.player.updateDurationDisplay();
             if (this.mediaDuration == null || this.currentMediaTime < this.mediaDuration || this.isLiveContent) {
-                this.playerHandler.updateCurrentTimeDisplay();
+                this.player.updateCurrentTimeDisplay();
                 this.updateProgressBarByTimer();
             }
             else if (this.mediaDuration > 0) {
@@ -603,35 +545,7 @@
         endPlayback() {
             this.currentMediaTime = 0;
             this.stopProgressTimer();
-            this.playerHandler.updateDisplay();
-        }
-        /**
-         * Makes human-readable message from chrome.cast.Error
-         * @param {chrome.cast.Error} error
-         * @return {string} error message
-         */
-        static getErrorMessage(error) {
-            switch (error.code) {
-                case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
-                    return "The API is not initialized." + (error.description ? " :" + error.description : "");
-                case chrome.cast.ErrorCode.CANCEL:
-                    return "The operation was canceled by the user" + (error.description ? " :" + error.description : "");
-                case chrome.cast.ErrorCode.CHANNEL_ERROR:
-                    return "A channel to the receiver is not available." + (error.description ? " :" + error.description : "");
-                case chrome.cast.ErrorCode.EXTENSION_MISSING:
-                    return "The Cast extension is not available." + (error.description ? " :" + error.description : "");
-                case chrome.cast.ErrorCode.INVALID_PARAMETER:
-                    return "The parameters to the operation were not valid." + (error.description ? " :" + error.description : "");
-                case chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE:
-                    return ("No receiver was compatible with the session request." + (error.description ? " :" + error.description : ""));
-                case chrome.cast.ErrorCode.SESSION_ERROR:
-                    return ("A session could not be created, or a session was invalid." +
-                        (error.description ? " :" + error.description : ""));
-                case chrome.cast.ErrorCode.TIMEOUT:
-                    return "The operation timed out." + (error.description ? " :" + error.description : "");
-                default:
-                    return error;
-            }
+            this.player.updateDisplay();
         }
     }
 
@@ -648,18 +562,25 @@
             const url = document.getElementById("url").value;
             const license = document.getElementById("license").value;
             const jwt = document.getElementById("jwt").value;
-            if (license.length > 0 && jwt.length > 0) ;
-            castPlayer.playerHandler.load(url);
+            if (license.length > 0 && jwt.length > 0) {
+                castPlayer.player.load(url, {
+                    licenseUrl: license,
+                    jwt,
+                });
+            }
+            else {
+                castPlayer.player.load(url);
+            }
         });
         (_b = document.getElementById("play")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
-            castPlayer.playerHandler.play();
+            castPlayer.player.play();
         });
         (_c = document.getElementById("pause")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
-            castPlayer.playerHandler.pause();
+            castPlayer.player.pause();
         });
         (_d = document.getElementById("seek")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => {
             const position = document.getElementById("position").value;
-            castPlayer.playerHandler.seekTo(parseInt(position));
+            castPlayer.player.seekTo(parseInt(position));
         });
     };
 

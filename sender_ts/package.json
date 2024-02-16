@@ -10,7 +10,8 @@
     "build": "rollup -c ./rollup.config.js",
     "eslint": "eslint 'src/**/*.ts'",
     "watch": "rollup -c ./rollup.config.js -w",
-    "start": "live-server"
+    "start": "live-server",
+    "dev": "npm run watch & npm run start"
   },
   "dependencies": {
     "@types/chromecast-caf-sender": "^1.0.8"

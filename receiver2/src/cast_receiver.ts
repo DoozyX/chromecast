@@ -10,10 +10,10 @@ import {
 } from "chromecast-caf-receiver/cast.framework.messages";
 import { EventType, MediaElementEvent, ErrorEvent } from "chromecast-caf-receiver/cast.framework.events";
 import { CastDebugLogger } from "chromecast-caf-receiver/cast.debug";
-// import { framework } from "chromecast-caf-receiver";
 import { Logger } from "./logger";
 
 import SmartWebPlayer from "../external/smart-web-player";
+import { Drm } from "./drm";
 
 export class CastReceiver {
   private readonly _context: CastReceiverContext;
@@ -62,23 +62,38 @@ export class CastReceiver {
   }
 
   // Setup playbackConfig with a sourceDescription license information passed by loadRequestData.
-  private readonly handleLoad = (loadRequestData: LoadRequestData) => {
+  private readonly handleLoad = (loadRequestData: LoadRequestData): null => {
     this.logger.debug("LOAD event received", loadRequestData);
     // If the loadRequestData is incomplete, return an error message
     if (!loadRequestData || !loadRequestData.media) {
       const error = new ErrorData(ErrorType.LOAD_FAILED);
       error.reason = ErrorReason.INVALID_REQUEST;
       this.logger.error("LOAD_FAILED: Verify the load request is set up properly and the media is able to play.");
-      return error;
+      return null;
     }
 
     const contentId = loadRequestData.media.contentId;
     const contentUrl = loadRequestData.media.contentUrl;
     this.logger.debug("received contentId", contentId, "contentUrl", contentUrl);
-    return this._player.setSrc(contentId);
 
     // Check for sourceDescription
-    // const sourceDescription = loadRequestData?.customData?.sourceDescription;
+    const drm = loadRequestData?.media.customData?.drm as Drm | undefined;
+    this.logger.debug("received drm", loadRequestData?.customData, drm);
+    if (drm) {
+      const license = drm.licenseUrl;
+      const jwt = drm.jwt;
+      this._player.setSrc(contentId, {
+        type: "widevine",
+        data: { licenseUrl: license },
+        headers: {
+          Authorization: jwt,
+        },
+      });
+    } else {
+      this._player.setSrc(contentId);
+    }
+
+    return null;
     // const selectedSource = sourceDescription?.sources?.find((source: any) => {
     //   return source.src === loadRequestData.media.contentId || source.src === loadRequestData.media.contentUrl;
     // });
@@ -108,21 +123,22 @@ export class CastReceiver {
     // return loadRequestData;
   };
 
-  private readonly handlePlay = (event: RequestData): any => {
+  private readonly handlePlay = (event: RequestData): null => {
     this.logger.debug("PLAY received");
     this._player.play();
     return null;
   };
 
-  private readonly handlePause = (event: RequestData): any => {
+  private readonly handlePause = (event: RequestData): null => {
     this.logger.debug("PAUSE received");
     this._player.pause();
     return null;
   };
 
-  private readonly handleSeek = (event: SeekRequestData): any => {
+  private readonly handleSeek = (event: SeekRequestData): null => {
     this.logger.debug("SEEK  received", event.currentTime);
     this._player.seekTo(event.currentTime ?? 0);
+    return null;
   };
 
   private readonly handlePlayEvent = (event: MediaElementEvent): void => {

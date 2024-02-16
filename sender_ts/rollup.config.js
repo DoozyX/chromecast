@@ -20,6 +20,6 @@ export default {
     plugins: [
         resolve(),
         commonJs({ extensions: [".js", ".ts"] }),
-        typescript()
+        typescript({ noEmitOnError: true })
     ],
 };
