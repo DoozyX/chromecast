@@ -26,6 +26,38 @@
 
     <script type="text/javascript"
         src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
+        <script>
+            window.onload = function () {
+  document.getElementById("load")?.addEventListener("click", () => {
+    const url = (document.getElementById("url")).value;
+    const license = (document.getElementById("license") ).value;
+    const jwt = (document.getElementById("jwt")).value;
+    if (license.length > 0 && jwt.length > 0) {
+      castPlayer.player.load(url, {
+        licenseUrl: license,
+        jwt,
+      });
+    } else {
+      castPlayer.player.load(url);
+    }
+  });
+
+  document.getElementById("play")?.addEventListener("click", () => {
+    castPlayer.player.play();
+  });
+
+  document.getElementById("pause")?.addEventListener("click", () => {
+    castPlayer.player.pause();
+  });
+
+  document.getElementById("seek")?.addEventListener("click", () => {
+    const position = (document.getElementById("position")).value;
+
+    castPlayer.player.seekTo(parseInt(position));
+  });
+};
+
+        </script>
 </body>
 
 </html>

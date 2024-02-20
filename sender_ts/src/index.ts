@@ -10,32 +10,4 @@ window["__onGCastApiAvailable"] = function (isAvailable: boolean) {
   }
 };
 
-window.onload = function () {
-  document.getElementById("load")?.addEventListener("click", () => {
-    const url = (document.getElementById("url") as HTMLInputElement).value;
-    const license = (document.getElementById("license") as HTMLInputElement).value;
-    const jwt = (document.getElementById("jwt") as HTMLInputElement).value;
-    if (license.length > 0 && jwt.length > 0) {
-      castPlayer.player.load(url, {
-        licenseUrl: license,
-        jwt,
-      });
-    } else {
-      castPlayer.player.load(url);
-    }
-  });
-
-  document.getElementById("play")?.addEventListener("click", () => {
-    castPlayer.player.play();
-  });
-
-  document.getElementById("pause")?.addEventListener("click", () => {
-    castPlayer.player.pause();
-  });
-
-  document.getElementById("seek")?.addEventListener("click", () => {
-    const position = (document.getElementById("position") as HTMLInputElement).value;
-
-    castPlayer.player.seekTo(parseInt(position));
-  });
-};
+export { castPlayer, CastPlayer };

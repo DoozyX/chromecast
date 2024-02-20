@@ -74,6 +74,14 @@ export class CastPlayer {
     this.logger = new Logger("CastPlayer");
   }
 
+  public viewElement() {
+    this.logger.debug("[Player viewElement]");
+    const castButton = document.createElement("google-cast-launcher");
+    castButton.id = "cast_button";
+
+    return castButton;
+  }
+
   public initializeCastPlayer() {
     this.logger.debug("initializeCastPlayer");
     this.context = cast.framework.CastContext.getInstance();

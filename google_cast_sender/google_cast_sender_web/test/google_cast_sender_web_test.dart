@@ -6,7 +6,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('GoogleCastSenderWeb', () {
-    const kPlatformName = 'Web';
     late GoogleCastSenderWeb googleCastSender;
 
     setUp(() async {
@@ -18,9 +17,8 @@ void main() {
       expect(GoogleCastSenderPlatform.instance, isA<GoogleCastSenderWeb>());
     });
 
-    test('getPlatformName returns correct name', () async {
-      final name = await googleCastSender.getPlatformName();
-      expect(name, equals(kPlatformName));
+    test('can load url', () async {
+      await googleCastSender.load('url');
     });
   });
 }

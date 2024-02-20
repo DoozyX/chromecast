@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_cast_sender_platform_interface/google_cast_sender_platform_interface.dart';
 
 /// An implementation of [GoogleCastSenderPlatform] that uses method channels.
@@ -9,7 +9,36 @@ class MethodChannelGoogleCastSender extends GoogleCastSenderPlatform {
   final methodChannel = const MethodChannel('google_cast_sender');
 
   @override
-  Future<String?> getPlatformName() {
-    return methodChannel.invokeMethod<String>('getPlatformName');
+  Future<void> load(String url, [String? licenseUrl, String? jwt]) {
+    return methodChannel.invokeMethod<void>('load', <String, dynamic>{
+      'url': url,
+      'licenseUrl': licenseUrl,
+      'jwt': jwt,
+    });
+  }
+
+  @override
+  Future<void> play() {
+    return methodChannel.invokeMethod<void>('play');
+  }
+
+  @override
+  Future<void> pause() {
+    return methodChannel.invokeMethod<void>('pause');
+  }
+
+  @override
+  Future<void> seekTo(num position) {
+    return methodChannel.invokeMethod<void>('seekTo', position);
+  }
+
+  @override
+  Widget buildView(int? textureId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> init() {
+    throw UnimplementedError();
   }
 }

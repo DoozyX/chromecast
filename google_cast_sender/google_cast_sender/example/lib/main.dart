@@ -38,6 +38,7 @@ class _HomePageState extends State<HomePage> {
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
             const SizedBox(height: 16),
+            const CastButton(),
             ElevatedButton(
               onPressed: () async {
                 if (!context.mounted) return;

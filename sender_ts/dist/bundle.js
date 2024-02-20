@@ -1,4 +1,4 @@
-(function () {
+var CastSender = (function (exports) {
     'use strict';
 
     class LoggerWriter {
@@ -317,6 +317,12 @@
             this.isLiveContent = false;
             this.logger = new Logger("CastPlayer");
         }
+        viewElement() {
+            this.logger.debug("[Player viewElement]");
+            const castButton = document.createElement("google-cast-launcher");
+            castButton.id = "cast_button";
+            return castButton;
+        }
         initializeCastPlayer() {
             this.logger.debug("initializeCastPlayer");
             this.context = cast.framework.CastContext.getInstance();
@@ -556,33 +562,11 @@
             castPlayer.initializeCastPlayer();
         }
     };
-    window.onload = function () {
-        var _a, _b, _c, _d;
-        (_a = document.getElementById("load")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
-            const url = document.getElementById("url").value;
-            const license = document.getElementById("license").value;
-            const jwt = document.getElementById("jwt").value;
-            if (license.length > 0 && jwt.length > 0) {
-                castPlayer.player.load(url, {
-                    licenseUrl: license,
-                    jwt,
-                });
-            }
-            else {
-                castPlayer.player.load(url);
-            }
-        });
-        (_b = document.getElementById("play")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", () => {
-            castPlayer.player.play();
-        });
-        (_c = document.getElementById("pause")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", () => {
-            castPlayer.player.pause();
-        });
-        (_d = document.getElementById("seek")) === null || _d === void 0 ? void 0 : _d.addEventListener("click", () => {
-            const position = document.getElementById("position").value;
-            castPlayer.player.seekTo(parseInt(position));
-        });
-    };
 
-})();
+    exports.CastPlayer = CastPlayer;
+    exports.castPlayer = castPlayer;
+
+    return exports;
+
+})({});
 //# sourceMappingURL=bundle.js.map
