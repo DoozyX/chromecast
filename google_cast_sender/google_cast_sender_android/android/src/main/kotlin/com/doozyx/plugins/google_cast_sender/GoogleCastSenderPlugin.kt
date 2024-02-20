@@ -1,35 +1,45 @@
 package com.doozyx.plugins.google_cast_sender
 
 import android.content.Context
-import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
-import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
-import io.flutter.plugin.common.MethodChannel.Result
 
-class GoogleCastSenderPlugin : FlutterPlugin, MethodCallHandler {
+class GoogleCastSenderPlugin : FlutterPlugin {
   private lateinit var channel: MethodChannel
   private var context: Context? = null
-
+private var api: GoogleCastSenderApiImplementation? = null
   override fun onAttachedToEngine(
-      @NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
+      flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
   ) {
-    channel = MethodChannel(flutterPluginBinding.binaryMessenger, "google_cast_sender_android")
-    channel.setMethodCallHandler(this)
+    api = GoogleCastSenderApiImplementation()
+    GoogleCastSenderApi.setUp(flutterPluginBinding.binaryMessenger, api)
     context = flutterPluginBinding.applicationContext
   }
 
-  override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
-    if (call.method == "getPlatformName") {
-      result.success("Android")
-    } else {
-      result.notImplemented()
-    }
+  override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    GoogleCastSenderApi.setUp(binding.binaryMessenger, null)
+    context = null
   }
 
-  override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
-    context = null
+  private class GoogleCastSenderApiImplementation : GoogleCastSenderApi {
+    override fun init() {
+      print("Init message")
+    }
+
+    override fun load(url: String, licenseUrl: String?, jwt: String?) {
+      print("Load message")
+    }
+
+    override fun play() {
+      TODO("Not yet implemented")
+    }
+
+    override fun pause() {
+      TODO("Not yet implemented")
+    }
+
+    override fun seekTo(position: Long) {
+      TODO("Not yet implemented")
+    }
   }
 }
