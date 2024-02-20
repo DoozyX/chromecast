@@ -9,20 +9,20 @@ environment:
 flutter:
   plugin:
     platforms:
-      # android:
-      #   default_package: google_cast_sender_android
-      # ios:
-      #   default_package: google_cast_sender_ios
+      android:
+        default_package: google_cast_sender_android
+      ios:
+        default_package: google_cast_sender_ios
       web:
         default_package: google_cast_sender_web
 
 dependencies:
   flutter:
     sdk: flutter
-  # google_cast_sender_android:
-  #   path: ../google_cast_sender_android
-  # google_cast_sender_ios:
-  #   path: ../google_cast_sender_ios
+  google_cast_sender_android:
+    path: ../google_cast_sender_android
+  google_cast_sender_ios:
+    path: ../google_cast_sender_ios
   google_cast_sender_platform_interface:
     path: ../google_cast_sender_platform_interface
   google_cast_sender_web:
