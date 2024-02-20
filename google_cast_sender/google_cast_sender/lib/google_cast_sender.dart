@@ -5,11 +5,22 @@ import 'package:google_cast_sender_platform_interface/google_cast_sender_platfor
 
 GoogleCastSenderPlatform get _platform => GoogleCastSenderPlatform.instance;
 
-/// Returns the name of the current platform.
-Future<String> getPlatformName() async {
-  await _platform.play();
-  // if (platformName == null) throw Exception('Unable to get platform name.');
-  return 'asd';
+class GoogleCastSender {
+  static Future<void> load(String url, [String? license, String? jwt]) async {
+    await _platform.load(url, license, jwt);
+  }
+
+  static Future<void> play() async {
+    await _platform.play();
+  }
+
+  static Future<void> pause() async {
+    await _platform.pause();
+  }
+
+  static Future<void> seek(int position) async {
+    await _platform.seekTo(position);
+  }
 }
 
 class CastButton extends StatelessWidget {

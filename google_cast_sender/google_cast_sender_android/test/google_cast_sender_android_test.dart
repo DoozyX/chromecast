@@ -7,7 +7,6 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('GoogleCastSenderAndroid', () {
-    const kPlatformName = 'Android';
     late GoogleCastSenderAndroid googleCastSender;
     late List<MethodCall> log;
 
@@ -15,16 +14,6 @@ void main() {
       googleCastSender = GoogleCastSenderAndroid();
 
       log = <MethodCall>[];
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(googleCastSender.methodChannel, (methodCall) async {
-        log.add(methodCall);
-        switch (methodCall.method) {
-          case 'getPlatformName':
-            return kPlatformName;
-          default:
-            return null;
-        }
-      });
     });
 
     test('can be registered', () {
@@ -33,12 +22,11 @@ void main() {
     });
 
     test('getPlatformName returns correct name', () async {
-      final name = await googleCastSender.getPlatformName();
+      await googleCastSender.play();
       expect(
         log,
-        <Matcher>[isMethodCall('getPlatformName', arguments: null)],
+        <Matcher>[isMethodCall('play', arguments: null)],
       );
-      expect(name, equals(kPlatformName));
     });
   });
 }

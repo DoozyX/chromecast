@@ -11,7 +11,7 @@ flutter:
     implements: google_cast_sender
     platforms:
       android:
-        package: com.example.verygoodcore
+        package: com.doozyx.plugins.google_cast_sender
         pluginClass: GoogleCastSenderPlugin
         dartPluginClass: GoogleCastSenderAndroid
 
@@ -24,5 +24,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  pigeon: ^17.0.0
   plugin_platform_interface: ^2.0.0
   very_good_analysis: ^5.1.0

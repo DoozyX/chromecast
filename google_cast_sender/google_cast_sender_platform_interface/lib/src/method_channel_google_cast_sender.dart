@@ -10,11 +10,7 @@ class MethodChannelGoogleCastSender extends GoogleCastSenderPlatform {
 
   @override
   Future<void> load(String url, [String? licenseUrl, String? jwt]) {
-    return methodChannel.invokeMethod<void>('load', <String, dynamic>{
-      'url': url,
-      'licenseUrl': licenseUrl,
-      'jwt': jwt,
-    });
+    throw UnimplementedError();
   }
 
   @override
