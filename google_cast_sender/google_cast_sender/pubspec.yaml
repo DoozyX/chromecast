@@ -21,12 +21,12 @@ dependencies:
     sdk: flutter
   google_cast_sender_android:
     path: ../google_cast_sender_android
-  google_cast_sender_ios:
-    path: ../google_cast_sender_ios
+  # google_cast_sender_ios:
+  #   path: ../google_cast_sender_ios
   google_cast_sender_platform_interface:
     path: ../google_cast_sender_platform_interface
-  google_cast_sender_web:
-    path: ../google_cast_sender_web
+  # google_cast_sender_web:
+  #   path: ../google_cast_sender_web
 
 dev_dependencies:
   flutter_test:
