@@ -1,6 +1,7 @@
 package com.doozyx.plugins.google_cast_sender
 
 import android.content.Context
+import android.util.Log
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.MethodChannel
 
@@ -27,7 +28,7 @@ private var api: GoogleCastSenderApiImplementation? = null
     }
 
     override fun load(url: String, licenseUrl: String?, jwt: String?) {
-      print("Load message")
+      Log.d("TAG", "LOAD message")
     }
 
     override fun play() {
