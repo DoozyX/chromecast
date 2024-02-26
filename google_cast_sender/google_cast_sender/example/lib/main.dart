@@ -20,7 +20,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final urlController = TextEditingController();
+  final urlController = TextEditingController(
+      text:
+          "https://office-new-dev.uniqcast.com:12801/auth-streaming/3,23f43c2ff418c66386c0b446674c78bf65e23368,1708778904,slobodan,0-rtlenkoder,8,8,8,8,8,8,8,8,DESKTOP,16242,all,none,default_basic,94.203.204.49/hls/stream/live/0-rtlenkoder/index.m3u8");
   final licenseController = TextEditingController();
   final jwtController = TextEditingController();
   final positionController = TextEditingController();
@@ -50,7 +52,6 @@ class _HomePageState extends State<HomePage> {
                 final url = urlController.text;
                 final license = licenseController.text;
                 final jwt = jwtController.text;
-                if (url.isEmpty) return;
                 if (license.isNotEmpty || jwt.isNotEmpty) {
                   GoogleCastSender.load(url, license, jwt);
                 } else {
