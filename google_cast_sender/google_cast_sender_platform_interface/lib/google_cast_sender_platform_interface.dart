@@ -1,6 +1,10 @@
 import 'package:flutter/widgets.dart';
+import 'package:google_cast_sender_platform_interface/src/cast_device.dart';
 import 'package:google_cast_sender_platform_interface/src/method_channel_google_cast_sender.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
+
+export 'package:google_cast_sender_platform_interface/src/cast_device.dart';
+export 'package:google_cast_sender_platform_interface/src/messages.g.dart';
 
 /// The interface that implementations of google_cast_sender must implement.
 ///
@@ -30,6 +34,10 @@ abstract class GoogleCastSenderPlatform extends PlatformInterface {
     PlatformInterface.verify(instance, _token);
     _instance = instance;
   }
+
+  /// List all available cast devices.
+  /// Returns a list of [CastDevice]s.
+  Future<List<CastDevice>> listDevices();
 
   /// Initialize the platform interface.
   Future<void> init();

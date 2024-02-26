@@ -42,8 +42,54 @@ class FlutterError (
   override val message: String? = null,
   val details: Any? = null
 ) : Throwable()
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class NativeCastDevice (
+  val name: String,
+  val id: String
+
+) {
+  companion object {
+    @Suppress("UNCHECKED_CAST")
+    fun fromList(list: List<Any?>): NativeCastDevice {
+      val name = list[0] as String
+      val id = list[1] as String
+      return NativeCastDevice(name, id)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf<Any?>(
+      name,
+      id,
+    )
+  }
+}
+@Suppress("UNCHECKED_CAST")
+private object GoogleCastSenderApiCodec : StandardMessageCodec() {
+  override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
+    return when (type) {
+      128.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          NativeCastDevice.fromList(it)
+        }
+      }
+      else -> super.readValueOfType(type, buffer)
+    }
+  }
+  override fun writeValue(stream: ByteArrayOutputStream, value: Any?)   {
+    when (value) {
+      is NativeCastDevice -> {
+        stream.write(128)
+        writeValue(stream, value.toList())
+      }
+      else -> super.writeValue(stream, value)
+    }
+  }
+}
+
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface GoogleCastSenderApi {
+  fun listDevices(): List<NativeCastDevice>
   /** Initialize the platform interface. */
   fun init()
   /** Load a media from a url. */
@@ -58,11 +104,27 @@ interface GoogleCastSenderApi {
   companion object {
     /** The codec used by GoogleCastSenderApi. */
     val codec: MessageCodec<Any?> by lazy {
-      StandardMessageCodec()
+      GoogleCastSenderApiCodec
     }
     /** Sets up an instance of `GoogleCastSenderApi` to handle messages through the `binaryMessenger`. */
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: GoogleCastSenderApi?) {
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.listDevices", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              wrapped = listOf<Any?>(api.listDevices())
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
       run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.init", codec)
         if (api != null) {

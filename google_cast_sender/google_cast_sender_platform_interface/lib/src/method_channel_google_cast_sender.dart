@@ -37,4 +37,9 @@ class MethodChannelGoogleCastSender extends GoogleCastSenderPlatform {
   Future<void> init() {
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<CastDevice>> listDevices() {
+    throw UnimplementedError();
+  }
 }

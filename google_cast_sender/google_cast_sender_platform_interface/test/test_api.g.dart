@@ -8,13 +8,13 @@ import 'package:flutter/foundation.dart' show ReadBuffer, WriteBuffer;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:google_cast_sender_android/src/messages.g.dart';
+import 'package:google_cast_sender_platform_interface/src/messages.g.dart';
 
 class _TestHostGoogleCastSenderApiCodec extends StandardMessageCodec {
   const _TestHostGoogleCastSenderApiCodec();
   @override
   void writeValue(WriteBuffer buffer, Object? value) {
-    if (value is CastDevice) {
+    if (value is NativeCastDevice) {
       buffer.putUint8(128);
       writeValue(buffer, value.encode());
     } else {
@@ -26,7 +26,7 @@ class _TestHostGoogleCastSenderApiCodec extends StandardMessageCodec {
   Object? readValueOfType(int type, ReadBuffer buffer) {
     switch (type) {
       case 128: 
-        return CastDevice.decode(readValue(buffer)!);
+        return NativeCastDevice.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -37,7 +37,7 @@ abstract class TestHostGoogleCastSenderApi {
   static TestDefaultBinaryMessengerBinding? get _testBinaryMessengerBinding => TestDefaultBinaryMessengerBinding.instance;
   static const MessageCodec<Object?> pigeonChannelCodec = _TestHostGoogleCastSenderApiCodec();
 
-  List<CastDevice?> listDevices();
+  List<NativeCastDevice?> listDevices();
 
   /// Initialize the platform interface.
   void init();
@@ -64,7 +64,7 @@ abstract class TestHostGoogleCastSenderApi {
       } else {
         _testBinaryMessengerBinding!.defaultBinaryMessenger.setMockDecodedMessageHandler<Object?>(__pigeon_channel, (Object? message) async {
           try {
-            final List<CastDevice?> output = api.listDevices();
+            final List<NativeCastDevice?> output = api.listDevices();
             return <Object?>[output];
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

@@ -6,14 +6,23 @@ import 'package:pigeon/pigeon.dart';
     dartOut: 'lib/src/messages.g.dart',
     dartTestOut: 'test/test_api.g.dart',
     kotlinOut:
-        'android/src/main/kotlin/com/doozyx/plugins/google_cast_sender/Messages.g.kt',
+        '../google_cast_sender_android/android/src/main/kotlin/com/doozyx/plugins/google_cast_sender/Messages.g.kt',
     kotlinOptions: KotlinOptions(
       package: 'com.doozyx.plugins.google_cast_sender',
     ),
   ),
 )
+class NativeCastDevice {
+  NativeCastDevice({required this.name, required this.id});
+
+  final String name;
+  final String id;
+}
+
 @HostApi(dartHostTestHandler: 'TestHostGoogleCastSenderApi')
 abstract class GoogleCastSenderApi {
+  List<NativeCastDevice> listDevices();
+
   /// Initialize the platform interface.
   void init();
 

@@ -14,6 +14,8 @@ import com.google.android.gms.cast.framework.SessionManagerListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 
 
+val TAG = "GoogleCastSenderPlugin"
+
 class GoogleCastSenderPlugin : FlutterPlugin {
     private lateinit var context: Context
     private var api: GoogleCastSenderApiImplementation? = null
@@ -32,7 +34,7 @@ class GoogleCastSenderPlugin : FlutterPlugin {
         api = GoogleCastSenderApiImplementation()
         GoogleCastSenderApi.setUp(flutterPluginBinding.binaryMessenger, api)
         mCastStateListener =
-            CastStateListener { newState -> Log.d("PLUGIGINCAST", "onCastStateChanged: $newState") }
+            CastStateListener { newState -> Log.d(TAG, "onCastStateChanged: $newState") }
         mCastContext = CastContext.getSharedInstance(context)
         mSessionManager = mCastContext.sessionManager
         // Listen for a successful join
@@ -46,27 +48,27 @@ class GoogleCastSenderPlugin : FlutterPlugin {
 
     private inner class SessionManagerListenerImpl : SessionManagerListener<CastSession> {
         override fun onSessionEnded(p0: CastSession, p1: Int) {
-            Log.d("TAG", "onSessionEnded")
+            Log.d(TAG, "onSessionEnded")
         }
 
         override fun onSessionEnding(p0: CastSession) {
-            Log.d("TAG", "onSessionEnding")
+            Log.d(TAG, "onSessionEnding")
         }
 
         override fun onSessionResumeFailed(p0: CastSession, p1: Int) {
-            Log.d("TAG", "onSessionResumeFailed")
+            Log.d(TAG, "onSessionResumeFailed")
         }
 
         override fun onSessionResumed(p0: CastSession, p1: Boolean) {
-            Log.d("TAG", "onSessionResumed")
+            Log.d(TAG, "onSessionResumed")
         }
 
         override fun onSessionResuming(p0: CastSession, p1: String) {
-            Log.d("TAG", "onSessionResuming")
+            Log.d(TAG, "onSessionResuming")
         }
 
         override fun onSessionStartFailed(p0: CastSession, p1: Int) {
-            Log.d("TAG", "onSessionStartFailed")
+            Log.d(TAG, "onSessionStartFailed")
         }
 
         override fun onSessionStarted(p0: CastSession, p1: String) {
@@ -92,17 +94,17 @@ class GoogleCastSenderPlugin : FlutterPlugin {
 //                .setCurrentTime(currentTime as Long * 1000)
                 .build()
 
-            Log.d("TAG", "LOADDD stream " + mUrl)
+            Log.d(TAG, "LOADDD stream " + mUrl)
 
             mCastSession?.remoteMediaClient?.load(loadRequest)
         }
 
         override fun onSessionStarting(p0: CastSession) {
-            Log.d("TAG", "onSessionStarting")
+            Log.d(TAG, "onSessionStarting")
         }
 
         override fun onSessionSuspended(p0: CastSession, p1: Int) {
-            Log.d("TAG", "onSessionSuspended")
+            Log.d(TAG, "onSessionSuspended")
         }
 
     }
@@ -120,18 +122,31 @@ class GoogleCastSenderPlugin : FlutterPlugin {
             print("Init message")
         }
 
+        override fun listDevices(): List<NativeCastDevice> {
+            Log.d(TAG, "listDevices")
+
+            val router =
+                MediaRouter.getInstance(context)
+            val routes = router.routes
+            return routes.mapNotNull { routeInfo ->
+                val device = CastDevice.getFromBundle(routeInfo.extras)
+
+                if (device != null) NativeCastDevice(device.friendlyName, device.deviceId) else null
+            }
+        }
+
         override fun load(url: String, licenseUrl: String?, jwt: String?) {
             mUrl = url
             print("LOADDD message")
-            Log.d("TAG", "LOADDD message")
+            Log.d(TAG, "LOADDD message")
             val router =
                 MediaRouter.getInstance(context)
             val routes = router.routes
             for (routeInfo in routes) {
                 val device = CastDevice.getFromBundle(routeInfo.extras)
-                Log.d("TAG", "Device: " + device?.friendlyName + " ID: " + device?.deviceId)
+                Log.d(TAG, "Device: " + device?.friendlyName + " ID: " + device?.deviceId)
                 if (device?.deviceId == "834ebccbc5691404cbb1e9b29544566d") {
-                    Log.d("TAG", "Device connecting...")
+                    Log.d(TAG, "Device connecting...")
                     router.selectRoute(routeInfo)
                 }
             }
