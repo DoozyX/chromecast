@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 import 'package:google_cast_sender_platform_interface/src/cast_device.dart';
-import 'package:google_cast_sender_platform_interface/src/method_channel_google_cast_sender.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 export 'package:google_cast_sender_platform_interface/src/cast_device.dart';
@@ -20,11 +19,9 @@ abstract class GoogleCastSenderPlatform extends PlatformInterface {
 
   static final Object _token = Object();
 
-  static GoogleCastSenderPlatform _instance = MethodChannelGoogleCastSender();
+  static late GoogleCastSenderPlatform _instance;
 
-  /// The default instance of [GoogleCastSenderPlatform] to use.
-  ///
-  /// Defaults to [MethodChannelGoogleCastSender].
+  /// The instance of [GoogleCastSenderPlatform] to use.
   static GoogleCastSenderPlatform get instance => _instance;
 
   /// Platform-specific plugins should set this with their own platform-specific
