@@ -22,6 +22,20 @@ class GoogleCastSenderAndroid extends GoogleCastSenderPlatform {
   }
 
   @override
+  Future<List<CastDevice>> listDevices() async {
+    final devices = await _api.listDevices();
+    return devices
+        .whereNotNull()
+        .map((device) => CastDevice(id: device.id, name: device.name))
+        .toList();
+  }
+
+  @override
+  Future<void> connect(String id) {
+    return _api.connect(id);
+  }
+
+  @override
   Future<void> load(String url, [String? licenseUrl, String? jwt]) {
     return _api.load(url, licenseUrl, jwt);
   }
@@ -39,14 +53,5 @@ class GoogleCastSenderAndroid extends GoogleCastSenderPlatform {
   @override
   Future<void> seekTo(num position) {
     return _api.seekTo(position.toInt());
-  }
-
-  @override
-  Future<List<CastDevice>> listDevices() async {
-    final devices = await _api.listDevices();
-    return devices
-        .whereNotNull()
-        .map((device) => CastDevice(id: device.id, name: device.name))
-        .toList();
   }
 }

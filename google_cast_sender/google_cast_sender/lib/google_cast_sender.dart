@@ -12,6 +12,10 @@ class GoogleCastSender {
     return _platform.listDevices();
   }
 
+  Future<void> connect(String id) async {
+    await _platform.connect(id);
+  }
+
   Future<void> load(String url, [String? license, String? jwt]) async {
     await _platform.load(url, license, jwt);
   }

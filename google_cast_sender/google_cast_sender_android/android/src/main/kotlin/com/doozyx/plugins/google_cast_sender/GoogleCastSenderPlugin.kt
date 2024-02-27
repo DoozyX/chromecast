@@ -6,12 +6,14 @@ import androidx.mediarouter.media.MediaRouter
 import com.google.android.gms.cast.CastDevice
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaLoadRequestData
+import com.google.android.gms.cast.MediaSeekOptions
 import com.google.android.gms.cast.framework.CastContext
 import com.google.android.gms.cast.framework.CastSession
 import com.google.android.gms.cast.framework.CastStateListener
 import com.google.android.gms.cast.framework.SessionManager
 import com.google.android.gms.cast.framework.SessionManagerListener
 import io.flutter.embedding.engine.plugins.FlutterPlugin
+import org.json.JSONObject
 
 
 val TAG = "GoogleCastSenderPlugin"
@@ -25,11 +27,11 @@ class GoogleCastSenderPlugin : FlutterPlugin {
     private lateinit var mSessionManager: SessionManager
     private val mSessionManagerListener: SessionManagerListenerImpl =
         SessionManagerListenerImpl()
-    private var mUrl: String? = null
 
     override fun onAttachedToEngine(
         flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     ) {
+        Log.d(TAG, "onAttachedToEngine")
         context = flutterPluginBinding.applicationContext
         api = GoogleCastSenderApiImplementation()
         GoogleCastSenderApi.setUp(flutterPluginBinding.binaryMessenger, api)
@@ -37,13 +39,7 @@ class GoogleCastSenderPlugin : FlutterPlugin {
             CastStateListener { newState -> Log.d(TAG, "onCastStateChanged: $newState") }
         mCastContext = CastContext.getSharedInstance(context)
         mSessionManager = mCastContext.sessionManager
-        // Listen for a successful join
-        // Listen for a successful join
         mSessionManager.addSessionManagerListener(mSessionManagerListener, CastSession::class.java)
-//        mSessionManager.addSessionManagerListener(
-//            mSessionManagerListener,
-//            CastSession::class.java
-//        )
     }
 
     private inner class SessionManagerListenerImpl : SessionManagerListener<CastSession> {
@@ -73,30 +69,6 @@ class GoogleCastSenderPlugin : FlutterPlugin {
 
         override fun onSessionStarted(p0: CastSession, p1: String) {
             mCastSession = p0
-            val url = mUrl
-                ?: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-            val mediaInfoBuilder = MediaInfo.Builder(url).build()
-
-//            mediaInfoBuilder.setMetadata(createMediaMetadata(metadata))
-
-//            val trackStyle: TextTrackStyle = ChromecastUtilities.parseTextTrackStyle(textTrackStyle)
-
-//            mediaInfoBuilder
-//                .setContentType(contentType)
-//                .setCustomData(customData)
-//                .setStreamType(intStreamType)
-//                .setStreamDuration(duration.toLong())
-//                .setTextTrackStyle(trackStyle)
-
-            val loadRequest = MediaLoadRequestData.Builder()
-                .setMediaInfo(mediaInfoBuilder)
-                .setAutoplay(true)
-//                .setCurrentTime(currentTime as Long * 1000)
-                .build()
-
-            Log.d(TAG, "LOADDD stream " + mUrl)
-
-            mCastSession?.remoteMediaClient?.load(loadRequest)
         }
 
         override fun onSessionStarting(p0: CastSession) {
@@ -111,6 +83,7 @@ class GoogleCastSenderPlugin : FlutterPlugin {
 
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+        Log.d(TAG, "onDetachedFromEngine")
         GoogleCastSenderApi.setUp(binding.binaryMessenger, null)
 //        context = null
     }
@@ -130,38 +103,74 @@ class GoogleCastSenderPlugin : FlutterPlugin {
             val routes = router.routes
             return routes.mapNotNull { routeInfo ->
                 val device = CastDevice.getFromBundle(routeInfo.extras)
-
-                if (device != null) NativeCastDevice(device.friendlyName, device.deviceId) else null
+                // TODO (handles connection/disconnected with isSelected)
+                if (device != null && !routeInfo.isSelected) NativeCastDevice(
+                    device.friendlyName,
+                    device.deviceId
+                ) else null
             }
         }
 
-        override fun load(url: String, licenseUrl: String?, jwt: String?) {
-            mUrl = url
-            print("LOADDD message")
-            Log.d(TAG, "LOADDD message")
+        override fun connect(id: String) {
+            Log.d(TAG, "connect")
             val router =
                 MediaRouter.getInstance(context)
             val routes = router.routes
             for (routeInfo in routes) {
                 val device = CastDevice.getFromBundle(routeInfo.extras)
-                Log.d(TAG, "Device: " + device?.friendlyName + " ID: " + device?.deviceId)
-                if (device?.deviceId == "834ebccbc5691404cbb1e9b29544566d") {
-                    Log.d(TAG, "Device connecting...")
+                if (device?.deviceId == id) {
                     router.selectRoute(routeInfo)
                 }
             }
         }
 
+        override fun load(url: String, licenseUrl: String?, jwt: String?) {
+            val mediaInfoBuilder = MediaInfo.Builder(url)
+
+            if (licenseUrl != null && jwt != null) {
+                mediaInfoBuilder.setCustomData(
+                    JSONObject(
+                        mapOf(
+                            "licenseUrl" to licenseUrl,
+                            "jwt" to jwt
+                        )
+                    )
+                )
+            }
+//            mediaInfoBuilder.setMetadata(createMediaMetadata(metadata))
+
+//            val trackStyle: TextTrackStyle = ChromecastUtilities.parseTextTrackStyle(textTrackStyle)
+
+//            mediaInfoBuilder
+//                .setContentType(contentType)
+//                .setCustomData(customData)
+//                .setStreamType(intStreamType)
+//                .setStreamDuration(duration.toLong())
+//                .setTextTrackStyle(trackStyle)
+
+            val loadRequest = MediaLoadRequestData.Builder()
+                .setMediaInfo(mediaInfoBuilder.build())
+//                .setAutoplay(true)
+//                .setCurrentTime(currentTime as Long * 1000)
+                .build()
+
+            Log.d(TAG, "LOADDD stream " + url)
+
+            mCastSession?.remoteMediaClient?.load(loadRequest)
+        }
+
         override fun play() {
-            TODO("Not yet implemented")
+            mCastSession?.remoteMediaClient?.play()
         }
 
         override fun pause() {
-            TODO("Not yet implemented")
+            mCastSession?.remoteMediaClient?.pause()
         }
 
         override fun seekTo(position: Long) {
-            TODO("Not yet implemented")
+            mCastSession?.remoteMediaClient?.seek(
+                MediaSeekOptions.Builder().setPosition(position).build()
+            )
         }
     }
 }

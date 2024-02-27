@@ -21,10 +21,14 @@ class NativeCastDevice {
 
 @HostApi(dartHostTestHandler: 'TestHostGoogleCastSenderApi')
 abstract class GoogleCastSenderApi {
-  List<NativeCastDevice> listDevices();
-
   /// Initialize the platform interface.
   void init();
+
+  /// List all available cast devices.
+  List<NativeCastDevice> listDevices();
+
+  /// Connect to a cast device with a given id.
+  void connect(String id);
 
   /// Load a media from a url.
   void load(String url, [String? licenseUrl, String? jwt]);

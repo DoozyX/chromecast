@@ -89,9 +89,12 @@ private object GoogleCastSenderApiCodec : StandardMessageCodec() {
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface GoogleCastSenderApi {
-  fun listDevices(): List<NativeCastDevice>
   /** Initialize the platform interface. */
   fun init()
+  /** List all available cast devices. */
+  fun listDevices(): List<NativeCastDevice>
+  /** Connect to a cast device with a given id. */
+  fun connect(id: String)
   /** Load a media from a url. */
   fun load(url: String, licenseUrl: String?, jwt: String?)
   /** play the current media. */
@@ -110,6 +113,23 @@ interface GoogleCastSenderApi {
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: GoogleCastSenderApi?) {
       run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.init", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            var wrapped: List<Any?>
+            try {
+              api.init()
+              wrapped = listOf<Any?>(null)
+            } catch (exception: Throwable) {
+              wrapped = wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.listDevices", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
@@ -126,12 +146,14 @@ interface GoogleCastSenderApi {
         }
       }
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.init", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.connect", codec)
         if (api != null) {
-          channel.setMessageHandler { _, reply ->
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val idArg = args[0] as String
             var wrapped: List<Any?>
             try {
-              api.init()
+              api.connect(idArg)
               wrapped = listOf<Any?>(null)
             } catch (exception: Throwable) {
               wrapped = wrapError(exception)

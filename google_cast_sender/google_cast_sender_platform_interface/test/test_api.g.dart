@@ -37,10 +37,14 @@ abstract class TestHostGoogleCastSenderApi {
   static TestDefaultBinaryMessengerBinding? get _testBinaryMessengerBinding => TestDefaultBinaryMessengerBinding.instance;
   static const MessageCodec<Object?> pigeonChannelCodec = _TestHostGoogleCastSenderApiCodec();
 
-  List<NativeCastDevice?> listDevices();
-
   /// Initialize the platform interface.
   void init();
+
+  /// List all available cast devices.
+  List<NativeCastDevice?> listDevices();
+
+  /// Connect to a cast device with a given id.
+  void connect(String id);
 
   /// Load a media from a url.
   void load(String url, [String? licenseUrl, String? jwt,]);
@@ -55,6 +59,25 @@ abstract class TestHostGoogleCastSenderApi {
   void seekTo(int position);
 
   static void setup(TestHostGoogleCastSenderApi? api, {BinaryMessenger? binaryMessenger}) {
+    {
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.init', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        _testBinaryMessengerBinding!.defaultBinaryMessenger.setMockDecodedMessageHandler<Object?>(__pigeon_channel, null);
+      } else {
+        _testBinaryMessengerBinding!.defaultBinaryMessenger.setMockDecodedMessageHandler<Object?>(__pigeon_channel, (Object? message) async {
+          try {
+            api.init();
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
           'dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.listDevices', pigeonChannelCodec,
@@ -76,14 +99,20 @@ abstract class TestHostGoogleCastSenderApi {
     }
     {
       final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.init', pigeonChannelCodec,
+          'dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.connect', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         _testBinaryMessengerBinding!.defaultBinaryMessenger.setMockDecodedMessageHandler<Object?>(__pigeon_channel, null);
       } else {
         _testBinaryMessengerBinding!.defaultBinaryMessenger.setMockDecodedMessageHandler<Object?>(__pigeon_channel, (Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.connect was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.google_cast_sender.GoogleCastSenderApi.connect was null, expected non-null String.');
           try {
-            api.init();
+            api.connect(arg_id!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

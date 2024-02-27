@@ -32,12 +32,15 @@ abstract class GoogleCastSenderPlatform extends PlatformInterface {
     _instance = instance;
   }
 
+  /// Initialize the platform interface.
+  Future<void> init();
+
   /// List all available cast devices.
   /// Returns a list of [CastDevice]s.
   Future<List<CastDevice>> listDevices();
 
-  /// Initialize the platform interface.
-  Future<void> init();
+  /// Connect to a cast device with a given id.
+  Future<void> connect(String id);
 
   /// Load a media from a url.
   Future<void> load(String url, [String? licenseUrl, String? jwt]);
