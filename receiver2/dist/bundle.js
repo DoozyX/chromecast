@@ -102,7 +102,9 @@ var CastReceiver = (function (exports, cast_framework, cast_framework_messages, 
             this.handleSeek = (event) => {
                 var _a;
                 this.logger.debug("SEEK  received", event.currentTime);
-                this._player.seekTo((_a = event.currentTime) !== null && _a !== void 0 ? _a : 0);
+                if (event.currentTime !== undefined) {
+                    this._player.seekTo((_a = event.currentTime * 1000) !== null && _a !== void 0 ? _a : 0);
+                }
                 return null;
             };
             this.handlePlayEvent = (event) => {

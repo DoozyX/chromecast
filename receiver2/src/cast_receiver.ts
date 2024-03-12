@@ -137,7 +137,9 @@ export class CastReceiver {
 
   private readonly handleSeek = (event: SeekRequestData): null => {
     this.logger.debug("SEEK  received", event.currentTime);
-    this._player.seekTo(event.currentTime ?? 0);
+    if (event.currentTime !== undefined) {
+      this._player.seekTo(event.currentTime * 1000 ?? 0);
+    }
     return null;
   };
 
