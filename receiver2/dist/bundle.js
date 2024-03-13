@@ -1,4 +1,4 @@
-var CastReceiver = (function (exports, cast_framework, cast_framework_messages, cast_framework_events, cast_debug, SmartWebPlayer) {
+var CastReceiver = (function (exports, cast_debug, cast_framework, cast_framework_events, cast_framework_messages, SmartWebPlayer) {
     'use strict';
 
     class Logger {
@@ -48,46 +48,25 @@ var CastReceiver = (function (exports, cast_framework, cast_framework_messages, 
                 const contentId = loadRequestData.media.contentId;
                 const contentUrl = loadRequestData.media.contentUrl;
                 this.logger.debug("received contentId", contentId, "contentUrl", contentUrl);
-                // Check for sourceDescription
                 const drm = (_a = loadRequestData === null || loadRequestData === void 0 ? void 0 : loadRequestData.media.customData) === null || _a === void 0 ? void 0 : _a.drm;
                 this.logger.debug("received drm", loadRequestData === null || loadRequestData === void 0 ? void 0 : loadRequestData.customData, drm);
-                if (drm) {
-                    const license = drm.licenseUrl;
-                    const jwt = drm.jwt;
-                    this._player.setSrc(contentId, {
+                this._player
+                    .setSrc(contentId, drm
+                    ? {
                         type: "widevine",
-                        data: { licenseUrl: license },
+                        data: { licenseUrl: drm.licenseUrl },
                         headers: {
-                            Authorization: jwt,
+                            Authorization: drm.jwt,
                         },
-                    });
-                }
-                else {
-                    this._player.setSrc(contentId);
-                }
+                    }
+                    : undefined)
+                    .then(() => {
+                    var _a;
+                    if (loadRequestData.currentTime !== undefined) {
+                        this._player.seekTo((_a = loadRequestData.currentTime * 1000) !== null && _a !== void 0 ? _a : 0);
+                    }
+                });
                 return null;
-                // const selectedSource = sourceDescription?.sources?.find((source: any) => {
-                //   return source.src === loadRequestData.media.contentId || source.src === loadRequestData.media.contentUrl;
-                // });
-                // if (selectedSource) {
-                //   const playbackConfig = Object.assign(new PlaybackConfig(), this._playerManager.getPlaybackConfig());
-                //   // Check for contentProtection (DRM)
-                //   const contentProtection = selectedSource.contentProtection ?? selectedSource.drm;
-                //   if (contentProtection) {
-                //     // Enrich playbackConfig with contentProtection properties.
-                //     // createContentProtectionConfigEnricher(contentProtection)?.enrich(playbackConfig); TODO
-                //   }
-                //   // Set an optional manifest request handler
-                //   playbackConfig.manifestRequestHandler = (_request: framework.NetworkRequestInfo) => {
-                //     // request.url = `<proxy>${request.url}`;
-                //   };
-                //   // Set an optional segment request handler
-                //   playbackConfig.segmentRequestHandler = (_request: framework.NetworkRequestInfo) => {
-                //     // request.url = `<proxy>${request.url}`;
-                //   };
-                //   this._playerManager.setPlaybackConfig(playbackConfig);
-                // }
-                // return loadRequestData;
             };
             this.handlePlay = (event) => {
                 this.logger.debug("PLAY received");
@@ -152,5 +131,5 @@ var CastReceiver = (function (exports, cast_framework, cast_framework_messages, 
 
     return exports;
 
-})({}, cast.framework, cast.framework.messages, cast.framework.events, cast.debug, SmartWebPlayer);
+})({}, cast.debug, cast.framework, cast.framework.events, cast.framework.messages, SmartWebPlayer);
 //# sourceMappingURL=bundle.js.map

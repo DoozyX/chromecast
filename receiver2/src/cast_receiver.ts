@@ -1,4 +1,6 @@
-import { CastReceiverContext, PlaybackConfig, PlayerManager } from "chromecast-caf-receiver/cast.framework";
+import { CastDebugLogger } from "chromecast-caf-receiver/cast.debug";
+import { CastReceiverContext, PlayerManager } from "chromecast-caf-receiver/cast.framework";
+import { ErrorEvent, EventType, MediaElementEvent } from "chromecast-caf-receiver/cast.framework.events";
 import {
   ErrorData,
   ErrorReason,
@@ -8,8 +10,6 @@ import {
   RequestData,
   SeekRequestData,
 } from "chromecast-caf-receiver/cast.framework.messages";
-import { EventType, MediaElementEvent, ErrorEvent } from "chromecast-caf-receiver/cast.framework.events";
-import { CastDebugLogger } from "chromecast-caf-receiver/cast.debug";
 import { Logger } from "./logger";
 
 import SmartWebPlayer from "../external/smart-web-player";
@@ -76,51 +76,28 @@ export class CastReceiver {
     const contentUrl = loadRequestData.media.contentUrl;
     this.logger.debug("received contentId", contentId, "contentUrl", contentUrl);
 
-    // Check for sourceDescription
     const drm = loadRequestData?.media.customData?.drm as Drm | undefined;
     this.logger.debug("received drm", loadRequestData?.customData, drm);
-    if (drm) {
-      const license = drm.licenseUrl;
-      const jwt = drm.jwt;
-      this._player.setSrc(contentId, {
-        type: "widevine",
-        data: { licenseUrl: license },
-        headers: {
-          Authorization: jwt,
-        },
+    this._player
+      .setSrc(
+        contentId,
+        drm
+          ? {
+              type: "widevine",
+              data: { licenseUrl: drm.licenseUrl },
+              headers: {
+                Authorization: drm.jwt,
+              },
+            }
+          : undefined,
+      )
+      .then(() => {
+        if (loadRequestData.currentTime !== undefined) {
+          this._player.seekTo(loadRequestData.currentTime * 1000 ?? 0);
+        }
       });
-    } else {
-      this._player.setSrc(contentId);
-    }
 
     return null;
-    // const selectedSource = sourceDescription?.sources?.find((source: any) => {
-    //   return source.src === loadRequestData.media.contentId || source.src === loadRequestData.media.contentUrl;
-    // });
-    // if (selectedSource) {
-    //   const playbackConfig = Object.assign(new PlaybackConfig(), this._playerManager.getPlaybackConfig());
-
-    //   // Check for contentProtection (DRM)
-    //   const contentProtection = selectedSource.contentProtection ?? selectedSource.drm;
-    //   if (contentProtection) {
-    //     // Enrich playbackConfig with contentProtection properties.
-    //     // createContentProtectionConfigEnricher(contentProtection)?.enrich(playbackConfig); TODO
-    //   }
-
-    //   // Set an optional manifest request handler
-    //   playbackConfig.manifestRequestHandler = (_request: framework.NetworkRequestInfo) => {
-    //     // request.url = `<proxy>${request.url}`;
-    //   };
-
-    //   // Set an optional segment request handler
-    //   playbackConfig.segmentRequestHandler = (_request: framework.NetworkRequestInfo) => {
-    //     // request.url = `<proxy>${request.url}`;
-    //   };
-
-    //   this._playerManager.setPlaybackConfig(playbackConfig);
-    // }
-
-    // return loadRequestData;
   };
 
   private readonly handlePlay = (event: RequestData): null => {
